@@ -1,6 +1,14 @@
-FROM openjdk:21-slim
+FROM amazoncorretto:17.0.7-alpine AS BUILD_IMAGE
 
-COPY ./build/libs/video-retelling-bot.jar /video-retelling-bot.jar
+COPY . ./
+
+RUN ./gradlew build -x test
+
+# ---
+
+FROM amazoncorretto:17.0.7-alpine
+
+COPY --from=BUILD_IMAGE ./build/libs/video-retelling-bot.jar /video-retelling-bot.jar
 COPY ./yt-dlp /yt-dlp
 
 EXPOSE 8008
