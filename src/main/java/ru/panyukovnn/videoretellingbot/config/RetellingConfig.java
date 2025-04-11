@@ -2,6 +2,7 @@ package ru.panyukovnn.videoretellingbot.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 import ru.panyukovnn.videoretellingbot.property.ExecutorsProperty;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -9,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+@EnableAsync
 @Configuration
 public class RetellingConfig {
 
