@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class Summarizer {
 
-    public static final String PROMPT = "Далее приведен текст, сделай его пересказ в виде статьи:\n\n";
+    public static final String PROMPT = "Далее приведен текст, сделай его пересказ в виде статьи (можно использовать смайлики):\n\n";
 
     private final OpenAiChatModel chatModel;
 

@@ -9,6 +9,12 @@ spring:
           model: deepseek-chat
           temperature: 0.0
 
+retelling:
+  executors:
+    tg-listener:
+      threads: 10
+      queue-capacity: 1000
+
 bot:
   name: ${BOT_NAME}
   token: ${BOT_TOKEN}

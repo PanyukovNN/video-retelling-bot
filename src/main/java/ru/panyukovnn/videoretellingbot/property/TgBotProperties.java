@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "bot")
-public class TLBotProperties {
+public class TgBotProperties {
 
     private String name;
     private String token;
