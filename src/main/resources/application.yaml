@@ -14,6 +14,7 @@ retelling:
     tg-listener:
       threads: 10
       queue-capacity: 1000
+  prompt-prefix: "Далее приведен текст, сделай его пересказ в виде статьи (можно использовать смайлики):"
 
 bot:
   name: ${BOT_NAME}
