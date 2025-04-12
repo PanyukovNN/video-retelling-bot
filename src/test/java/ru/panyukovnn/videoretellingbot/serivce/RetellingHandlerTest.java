@@ -18,7 +18,9 @@ class RetellingHandlerTest {
         "https://youtu.be/dQw4w9WgXcQ",
         "https://m.youtube.com/watch?v=1Zr_ydPsmas&list=WL&index=6&ab_channel=MaximDorofeev",
         "https://www.m.youtube.com/watch?v=dQw4w9WgXcQ",
-        "https://youtube.com/watch?v=dQw4w9WgXcQ"
+        "https://youtube.com/watch?v=dQw4w9WgXcQ",
+        "https://youtube.com/shorts/YOJ9yQx5ea4?si=Bjau-s_nZ-70Dkkw",
+        "https://www.youtube.com/live/GNAiIFSwEGk?si=g1SSch43qU7eLohb"
     })
     void when_checkValidYoutubeLink_then_success(String validYoutubeLink) {
         retellingHandler.checkYoutubeLink(validYoutubeLink);

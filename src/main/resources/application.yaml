@@ -19,3 +19,9 @@ retelling:
 bot:
   name: ${BOT_NAME}
   token: ${BOT_TOKEN}
+
+logging:
+  level:
+    root: INFO
+  console:
+    enabled: true

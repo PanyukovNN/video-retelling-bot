@@ -11,17 +11,15 @@ import java.nio.file.Files;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
 public class YoutubeSubtitlesExtractor {
 
-    private static final String SUBTITLES_LANG = "ru";
-    public static final String SUBTITLES_DIRECTORY = "./subtitles/";
+    private static final String SUBTITLES_LANG_RU = "ru";
+    private static final String SUBTITLES_LANG_EN = "en";
+    private static final String SUBTITLES_DIRECTORY = "./subtitles/";
 
     public String extractYoutubeVideoSubtitles(String videoUrl) {
         log.info("Начинаю загрузку субтитров из youtube видео по ссылке: {}", videoUrl);
@@ -29,7 +27,7 @@ public class YoutubeSubtitlesExtractor {
         cleanSubtitlesFolder();
 
         try {
-            String subtitlesFilename = downloadSubtitles(videoUrl);
+            String subtitlesFilename = loadSubtitles(videoUrl);
 
             File subtitlesFile = new File(SUBTITLES_DIRECTORY + subtitlesFilename);
 
@@ -42,6 +40,20 @@ public class YoutubeSubtitlesExtractor {
 
             throw new RetellingException("63e9", "Не удалось извлечь субтитры из видео");
         }
+    }
+
+    /**
+     * Пытаемся загрузить субтитры с разными языками, при этом проверяем наличие как встроенных, так и автогенерируемых
+     *
+     * @param videoUrl ссылка на видео
+     * @return имя файла с загруженными субтитрами
+     */
+    private String loadSubtitles(String videoUrl) {
+        return tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_RU, false)
+            .orElseGet(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_RU, true)
+                .orElseGet(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_EN, false)
+                    .orElseGet(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_EN, true)
+                        .orElseThrow(() -> new RetellingException("48ae", "Для указанного видео отсутствуют субтитры")))));
     }
 
     private void cleanSubtitlesFolder() {
@@ -70,13 +82,13 @@ public class YoutubeSubtitlesExtractor {
      * @param videoUrl ссылка на видео на youtube
      * @return имя файла с субтитрами, куда произошла выгрузка
      */
-    private String downloadSubtitles(String videoUrl) {
+    private Optional<String> tryDownloadSubtitles(String videoUrl, String lang, boolean isAutoSubs) {
         String outputFileName = "subtitles-" + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME) + "-" + UUID.randomUUID().toString().substring(0, 8);
 
         ProcessBuilder builder = new ProcessBuilder(
             "./yt-dlp/" + defineYtDlpExecutableFileName(),
-            "--write-auto-subs",
-            "--sub-lang", SUBTITLES_LANG,
+            isAutoSubs ? "--write-auto-subs" : "--write-subs",
+            "--sub-lang", lang,
             "--sub-format", "vtt",
             "--skip-download",
             "-o", SUBTITLES_DIRECTORY + outputFileName,
@@ -97,6 +109,10 @@ public class YoutubeSubtitlesExtractor {
             String line;
             while ((line = reader.readLine()) != null) {
                 log.info(line);
+
+                if (line.contains("There are no subtitles for the requested languages")) {
+                    return Optional.empty();
+                }
             }
 
             int exitCode = process.waitFor();
@@ -109,7 +125,7 @@ public class YoutubeSubtitlesExtractor {
 
         log.info("Субтитры успешо загружены");
 
-        return outputFileName + "." + SUBTITLES_LANG + ".vtt";
+        return Optional.of(outputFileName + "." + lang + ".vtt");
     }
 
     private Set<String> cleanSubtitles(List<String> lines) {

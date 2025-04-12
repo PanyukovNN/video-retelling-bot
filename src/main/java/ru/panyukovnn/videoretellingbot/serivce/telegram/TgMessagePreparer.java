@@ -14,10 +14,11 @@ import static ru.panyukovnn.videoretellingbot.util.Constants.MAX_TG_MESSAGE_SIZE
 @RequiredArgsConstructor
 public class TgMessagePreparer {
 
-    public List<String> prepareLongTgMessage(String content) {
-        String cleanedSummary = changeHashSignsToBoldInMarkdown(content);
+    public List<String> prepareTgMessage(String content) {
+        String summaryWithoutHashSigns = changeHashSignsToBoldInMarkdown(content);
+        String escapedSymbolsSummary = prepareForMarkdownV2(summaryWithoutHashSigns);
 
-        List<String> splitLongMessages = splitTooLongMessage(cleanedSummary);
+        List<String> splitLongMessages = splitTooLongMessage(escapedSymbolsSummary);
 
         splitLongMessages.forEach(log::info);
 
@@ -55,16 +56,26 @@ public class TgMessagePreparer {
         StringBuilder output = new StringBuilder();
 
         for (String line : lines) {
-            String lineWithNewline = line + "\n";
-
-            if (lineWithNewline.startsWith("#")) {
-                String cleaned = lineWithNewline.replaceFirst("^#+", "").trim();
-                output.append(cleaned);
+            if (line.startsWith("#")) {
+                String cleaned = line.replaceFirst("^#+", "").trim();
+                output
+                    .append("*")
+                    .append(cleaned)
+                    .append("*");
             } else {
-                output.append(lineWithNewline);
+                output.append(line);
             }
+
+            output.append("\n");
         }
 
         return output.toString();
+    }
+
+
+    protected String prepareForMarkdownV2(String message) {
+        String escapedMessage = message.replaceAll("([_\\[\\]\\(\\)~`>#+\\-=|{}.!])", "\\\\$1");
+
+        return escapedMessage.replaceAll("\\*\\*", "*"); // заменяем двойные звездочки на одинарные, чтобы корректно отображалось выделение жирным
     }
 }

@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 @Service
 public class StartCommand extends BotCommand {
 
-    public static final String GREETING_MESSAGE = "Hello, friend!";
+    public static final String GREETING_MESSAGE = "Привет, я могу подготовить развернутый конспект по видео с youtube, пришли мне ссылку на видео, которое хочешь законспектировать";
 
     public StartCommand() {
         super("start", "Start command");

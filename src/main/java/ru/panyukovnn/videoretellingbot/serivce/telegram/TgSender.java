@@ -18,7 +18,7 @@ public class TgSender {
     private final TgMessagePreparer tgMessagePreparer;
 
     public void sendMessage(Long chatId, String message) {
-        List<String> splitLongMessages = tgMessagePreparer.prepareLongTgMessage(message);
+        List<String> splitLongMessages = tgMessagePreparer.prepareTgMessage(message);
 
         splitLongMessages.forEach(splitMessage -> executeSendMessage(chatId, splitMessage));
     }
@@ -27,7 +27,7 @@ public class TgSender {
         try {
             botApi.execute(SendMessage.builder()
                 .chatId(chatId)
-                .parseMode("Markdown")
+                .parseMode("MarkdownV2")
                 .text(message)
                 .build());
         } catch (TelegramApiException e) {
