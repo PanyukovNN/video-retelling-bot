@@ -74,7 +74,7 @@ public class TgMessagePreparer {
 
 
     protected String prepareForMarkdownV2(String message) {
-        String escapedMessage = message.replaceAll("([_\\[\\]\\(\\)~`>#+\\-=|{}.!])", "\\\\$1");
+        String escapedMessage = message.replaceAll("([_\\[\\]\\(\\)~>#+\\-=|{}.!])", "\\\\$1");
 
         return escapedMessage.replaceAll("\\*\\*", "*"); // заменяем двойные звездочки на одинарные, чтобы корректно отображалось выделение жирным
     }
