@@ -8,6 +8,7 @@ spring:
         options:
           model: deepseek-chat
           temperature: 0.0
+          max-tokens: 8192
 
 retelling:
   executors:
