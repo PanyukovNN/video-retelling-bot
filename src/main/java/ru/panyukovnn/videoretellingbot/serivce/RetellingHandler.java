@@ -5,9 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.panyukovnn.videoretellingbot.client.OpenAiClient;
 import ru.panyukovnn.videoretellingbot.exception.RetellingException;
-import ru.panyukovnn.videoretellingbot.property.RetellingProperties;
 import ru.panyukovnn.videoretellingbot.serivce.telegram.TgSender;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 import static ru.panyukovnn.videoretellingbot.util.Constants.YOUTUBE_URL_REGEX;
@@ -19,7 +20,6 @@ public class RetellingHandler {
 
     private final TgSender tgSender;
     private final OpenAiClient openAiClient;
-    private final RetellingProperties retellingProperties;
     private final YoutubeSubtitlesExtractor youtubeSubtitlesExtractor;
 
     public void handleRetelling(Long chatId, String inputMessage) {
@@ -31,9 +31,24 @@ public class RetellingHandler {
 
         tgSender.sendMessage(chatId, "Формирую статью (это может занимать до 2х минут)");
 
-        String videoSummary = openAiClient.openAiCall(retellingProperties.getPromptPrefix() + "\n\n" + subtitles);
+        AtomicInteger paragraphsCount = new AtomicInteger();
+        AtomicReference<StringBuilder> atomicReference = new AtomicReference<>(new StringBuilder());
 
-        tgSender.sendMessage(chatId, videoSummary);
+        openAiClient.openAiCall(subtitles)
+            .handle((token, sink) -> {
+                atomicReference.get().append(token);
+
+                if (atomicReference.get().toString().endsWith("\n\n")) {
+                    if (paragraphsCount.incrementAndGet() > 1) {
+                        sink.next(atomicReference.get().toString());
+                        atomicReference.set(new StringBuilder());
+                        paragraphsCount.set(0);
+                    }
+                }
+            })
+            .doOnNext(videoSummary -> tgSender.sendMessage(chatId, (String) videoSummary))
+            .doOnComplete(() -> tgSender.sendMessage(chatId, atomicReference.get().toString()))
+            .subscribe();
     }
 
     protected void checkYoutubeLink(String messageText) {
