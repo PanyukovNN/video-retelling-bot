@@ -1,16 +1,14 @@
-package ru.panyukovnn.videoretellingbot.serivce;
+package ru.panyukovnn.videoretellingbot.util;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
-class RetellingHandlerTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    @InjectMocks
-    private RetellingHandler retellingHandler;
+@ExtendWith(MockitoExtension.class)
+class YoutubeLinkHelperTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -23,6 +21,17 @@ class RetellingHandlerTest {
         "https://www.youtube.com/live/GNAiIFSwEGk?si=g1SSch43qU7eLohb"
     })
     void when_checkValidYoutubeLink_then_success(String validYoutubeLink) {
-        retellingHandler.checkYoutubeLink(validYoutubeLink);
+        YoutubeLinkHelper.checkYoutubeLink(validYoutubeLink);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "https://www.youtube.com/watch?v=abc123&feature=share&t=10",
+        "https://www.youtube.com/watch?v=abc123",
+        "https://www.youtube.com/watch?v=abc123&list=PLVe-2wcL84b&index=18&ab_channel=Some%2CThing%2FEncoded"
+    })
+    void shouldKeepOnlyVParam(String youtubeLink) {
+        String actual = YoutubeLinkHelper.removeRedundantQueryParamsFromYoutubeLint(youtubeLink);
+        assertEquals("https://www.youtube.com/watch?v=abc123", actual);
     }
 }
