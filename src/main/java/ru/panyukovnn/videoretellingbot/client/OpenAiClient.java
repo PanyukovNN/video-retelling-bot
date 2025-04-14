@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OpenAiClient {
 
-    public static final int WORDS_COUNT_THRESHOLD = 30000;
+    public static final int WORDS_COUNT_THRESHOLD = 25000;
 
     private final OpenAiChatModel chatModel;
     private final RetellingProperties retellingProperties;
