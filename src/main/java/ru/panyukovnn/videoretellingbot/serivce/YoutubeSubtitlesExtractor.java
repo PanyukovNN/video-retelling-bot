@@ -12,6 +12,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
@@ -49,11 +53,29 @@ public class YoutubeSubtitlesExtractor {
      * @return имя файла с загруженными субтитрами
      */
     private String loadSubtitles(String videoUrl) {
-        return tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_RU, false)
-            .orElseGet(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_RU, true)
-                .orElseGet(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_EN, false)
-                    .orElseGet(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_EN, true)
-                        .orElseThrow(() -> new RetellingException("48ae", "Для указанного видео отсутствуют субтитры")))));
+        try (ExecutorService executorService = Executors.newFixedThreadPool(4)) {
+            CompletableFuture<Optional<String>> ruSubtitles = CompletableFuture.supplyAsync(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_RU, false), executorService);
+            CompletableFuture<Optional<String>> autoGenRuSubtitles = CompletableFuture.supplyAsync(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_RU, true), executorService);
+            CompletableFuture<Optional<String>> enSubtitles = CompletableFuture.supplyAsync(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_EN, false), executorService);
+            CompletableFuture<Optional<String>> autoGenEnSubtitles = CompletableFuture.supplyAsync(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_EN, true), executorService);
+
+            return CompletableFuture.allOf(ruSubtitles, autoGenRuSubtitles, enSubtitles, autoGenEnSubtitles)
+                .thenApply(action -> {
+                    Optional<String> optionalRuSubs = ruSubtitles.getNow(Optional.empty());
+                    Optional<String> optionalRuAutoGenSubs = autoGenRuSubtitles.getNow(Optional.empty());
+                    Optional<String> optionalEnSubs = enSubtitles.getNow(Optional.empty());
+                    Optional<String> optionalEnAutoGenSubs = autoGenEnSubtitles.getNow(Optional.empty());
+
+                    return optionalRuSubs
+                        .orElseGet(() -> optionalRuAutoGenSubs
+                            .orElseGet(() -> optionalEnSubs
+                                .orElseGet(() -> optionalEnAutoGenSubs
+                                    .orElseThrow(() -> new RetellingException("48ae", "Для указанного видео отсутствуют субтитры")))));
+                })
+                .get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RetellingException("3db2", "Ошибка выгрузки файлов субтитров: " + e.getMessage(), e);
+        }
     }
 
     private void cleanSubtitlesFolder() {

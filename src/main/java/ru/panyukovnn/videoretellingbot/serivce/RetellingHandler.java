@@ -36,9 +36,11 @@ public class RetellingHandler {
         AtomicReference<StringBuilder> atomicReference = new AtomicReference<>(new StringBuilder());
 
         openAiClient.openAiCall(subtitles)
+            .reduce(new StringBuilder(), StringBuilder::append)
+            .map(StringBuilder::toString)
 //            .handle((token, sink) -> {
-//                atomicReference.get().append(token);
-//
+//                    atomicReference.get().append(token);
+
 //                if (atomicReference.get().toString().endsWith("\n\n")) {
 //                    if (paragraphsCount.incrementAndGet() > 1) {
 //                        sink.next(atomicReference.get().toString());
@@ -46,9 +48,9 @@ public class RetellingHandler {
 //                        paragraphsCount.set(0);
 //                    }
 //                }
+//                }
 //            })
-//            .doOnNext(videoSummary -> tgSender.sendMessage(chatId, (String) videoSummary))
-            .doOnComplete(() -> tgSender.sendMessage(chatId, atomicReference.get().toString()))
+            .doOnNext(videoSummary -> tgSender.sendMessage(chatId, videoSummary))
             .onErrorResume(e -> e instanceof RetellingException, e -> {
                 log.error("Ошибка бизнес логики. id: {}. Сообщение: {}", ((RetellingException) e).getId(), e.getMessage(), e);
 
@@ -63,7 +65,7 @@ public class RetellingHandler {
 
                 return Mono.empty();
             })
-            .subscribe();
+            .subscribe(o -> log.info("Пересказ успешно выполнен и доставлен"));
     }
 
     protected void checkYoutubeLink(String messageText) {
