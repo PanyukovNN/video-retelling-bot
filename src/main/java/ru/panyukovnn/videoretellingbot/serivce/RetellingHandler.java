@@ -3,6 +3,7 @@ package ru.panyukovnn.videoretellingbot.serivce;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 import ru.panyukovnn.videoretellingbot.client.OpenAiClient;
 import ru.panyukovnn.videoretellingbot.exception.RetellingException;
 import ru.panyukovnn.videoretellingbot.serivce.telegram.TgSender;
@@ -35,19 +36,33 @@ public class RetellingHandler {
         AtomicReference<StringBuilder> atomicReference = new AtomicReference<>(new StringBuilder());
 
         openAiClient.openAiCall(subtitles)
-            .handle((token, sink) -> {
-                atomicReference.get().append(token);
-
-                if (atomicReference.get().toString().endsWith("\n\n")) {
-                    if (paragraphsCount.incrementAndGet() > 1) {
-                        sink.next(atomicReference.get().toString());
-                        atomicReference.set(new StringBuilder());
-                        paragraphsCount.set(0);
-                    }
-                }
-            })
+//            .handle((token, sink) -> {
+//                atomicReference.get().append(token);
+//
+//                if (atomicReference.get().toString().endsWith("\n\n")) {
+//                    if (paragraphsCount.incrementAndGet() > 1) {
+//                        sink.next(atomicReference.get().toString());
+//                        atomicReference.set(new StringBuilder());
+//                        paragraphsCount.set(0);
+//                    }
+//                }
+//            })
             .doOnNext(videoSummary -> tgSender.sendMessage(chatId, (String) videoSummary))
             .doOnComplete(() -> tgSender.sendMessage(chatId, atomicReference.get().toString()))
+            .onErrorResume(e -> e instanceof RetellingException, e -> {
+                log.error("Ошибка бизнес логики. id: {}. Сообщение: {}", ((RetellingException) e).getId(), e.getMessage(), e);
+
+                tgSender.sendMessage(chatId, "В процессе работы возникла ошибка: " + e.getMessage());
+
+                return Mono.empty();
+            })
+            .onErrorResume(e -> {
+                log.error(e.getMessage(), e);
+
+                tgSender.sendMessage(chatId, "Непредвиденная ошибка при отправке сообщения");
+
+                return Mono.empty();
+            })
             .subscribe();
     }
 
