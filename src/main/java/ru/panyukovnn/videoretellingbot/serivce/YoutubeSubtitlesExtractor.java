@@ -53,7 +53,9 @@ public class YoutubeSubtitlesExtractor {
      * @return имя файла с загруженными субтитрами
      */
     private String loadSubtitles(String videoUrl) {
-        try (ExecutorService executorService = Executors.newFixedThreadPool(4)) {
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+        try {
             CompletableFuture<Optional<String>> ruSubtitles = CompletableFuture.supplyAsync(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_RU, false), executorService);
             CompletableFuture<Optional<String>> autoGenRuSubtitles = CompletableFuture.supplyAsync(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_RU, true), executorService);
             CompletableFuture<Optional<String>> enSubtitles = CompletableFuture.supplyAsync(() -> tryDownloadSubtitles(videoUrl, SUBTITLES_LANG_EN, false), executorService);
@@ -75,6 +77,8 @@ public class YoutubeSubtitlesExtractor {
                 .get();
         } catch (ExecutionException | InterruptedException e) {
             throw new RetellingException("3db2", "Ошибка выгрузки файлов субтитров: " + e.getMessage(), e);
+        } finally {
+            executorService.shutdown();
         }
     }
 
