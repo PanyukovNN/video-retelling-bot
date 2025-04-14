@@ -47,7 +47,7 @@ public class RetellingHandler {
 //                    }
 //                }
 //            })
-            .doOnNext(videoSummary -> tgSender.sendMessage(chatId, (String) videoSummary))
+//            .doOnNext(videoSummary -> tgSender.sendMessage(chatId, (String) videoSummary))
             .doOnComplete(() -> tgSender.sendMessage(chatId, atomicReference.get().toString()))
             .onErrorResume(e -> e instanceof RetellingException, e -> {
                 log.error("Ошибка бизнес логики. id: {}. Сообщение: {}", ((RetellingException) e).getId(), e.getMessage(), e);
