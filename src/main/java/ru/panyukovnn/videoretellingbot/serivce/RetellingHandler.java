@@ -19,7 +19,10 @@ public class RetellingHandler {
     private final YoutubeSubtitlesExtractor youtubeSubtitlesExtractor;
 
     public void handleRetelling(Long chatId, String inputMessage) {
-        YoutubeLinkHelper.checkYoutubeLink(inputMessage);
+        if (!YoutubeLinkHelper.isValidYoutubeUrl(inputMessage)) {
+            throw new RetellingException("824c", "Невалидная ссылка youtube");
+        }
+
         String cleanedYoutubeLink = YoutubeLinkHelper.removeRedundantQueryParamsFromYoutubeLint(inputMessage);
 
         tgSender.sendMessage(chatId, "Извлекаю содержание");
@@ -28,7 +31,7 @@ public class RetellingHandler {
 
         tgSender.sendMessage(chatId, "Формирую статью (это может занимать до 2х минут)");
 
-        openAiClient.openAiCall(subtitles)
+        openAiClient.retellingCall(subtitles)
             .reduce(new StringBuilder(), StringBuilder::append)
             .map(StringBuilder::toString)
             .doOnNext(videoSummary -> tgSender.sendMessage(chatId, videoSummary))

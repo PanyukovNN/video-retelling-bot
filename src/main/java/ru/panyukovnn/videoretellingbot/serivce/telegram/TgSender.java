@@ -2,11 +2,14 @@ package ru.panyukovnn.videoretellingbot.serivce.telegram;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import reactor.core.publisher.Mono;
 import ru.panyukovnn.videoretellingbot.config.TgBotApi;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -27,7 +30,8 @@ public class TgSender {
         try {
             botApi.execute(SendMessage.builder()
                 .chatId(chatId)
-                .parseMode("MarkdownV2")
+                .disableWebPagePreview(true)
+                .parseMode("Markdown")
                 .text(message)
                 .build());
         } catch (TelegramApiException e) {

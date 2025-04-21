@@ -6,9 +6,9 @@ import ru.panyukovnn.videoretellingbot.exception.RetellingException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.regex.Pattern;
+import java.net.URL;
 
-import static ru.panyukovnn.videoretellingbot.util.Constants.YOUTUBE_URL_REGEX;
+import static ru.panyukovnn.videoretellingbot.util.Constants.YOUTUBE_VIDEO_ID_PATTERN;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class YoutubeLinkHelper {
@@ -45,11 +45,70 @@ public class YoutubeLinkHelper {
         }
     }
 
-    public static void checkYoutubeLink(String messageText) {
-        boolean validYoutubeVideoLink = Pattern.matches(YOUTUBE_URL_REGEX, messageText);
+    public static boolean isValidYoutubeUrl(String url) {
+        try {
+            URL parsedUrl = new URL(url);
+            String host = parsedUrl.getHost().toLowerCase();
+            String path = parsedUrl.getPath();
+            String query = parsedUrl.getQuery();
 
-        if (!validYoutubeVideoLink) {
-            throw new RetellingException("824c", "Невалидная ссылка youtube");
+            if (!isValidHostSyntax(host)) {
+                return false;
+            }
+
+            if (isValidYouTubeHost(host)) {
+                if (host.equals("youtu.be")) {
+                    String id = path.replaceFirst("^/", "");
+                    return YOUTUBE_VIDEO_ID_PATTERN.matcher(id).matches();
+                }
+
+                if (path.startsWith("/watch")) {
+                    if (query == null) return false;
+                    for (String param : query.split("&")) {
+                        if (param.startsWith("v=")) {
+                            String id = param.substring(2);
+                            return YOUTUBE_VIDEO_ID_PATTERN.matcher(id).matches();
+                        }
+                    }
+                } else if (path.startsWith("/shorts/") || path.startsWith("/live/")) {
+                    String[] segments = path.split("/");
+                    if (segments.length >= 3) {
+                        String id = segments[2];
+                        return YOUTUBE_VIDEO_ID_PATTERN.matcher(id).matches();
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            return false;
         }
+
+        return false;
+    }
+
+    private static boolean isValidHostSyntax(String host) {
+        if (host == null || host.isEmpty()) return false;
+        if (host.startsWith(".")) return false;
+        if (!host.matches("^[a-z0-9.-]+$")) return false;
+        return true;
+    }
+
+    private static boolean isValidYouTubeHost(String host) {
+        // Явные валидные хосты
+        if (host.equals("youtube.com") || host.equals("youtu.be")) {
+            return true;
+        }
+
+        // Поддомены youtube.com, но не что-то вроде ".youtube.com" или "fakeyoutube.com"
+        if (host.endsWith(".youtube.com")) {
+            // Отсекаем всё до последней точки перед youtube.com
+            String[] parts = host.split("\\.");
+            int len = parts.length;
+            if (len >= 3 && parts[len - 2].equals("youtube") && parts[len - 1].equals("com")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
