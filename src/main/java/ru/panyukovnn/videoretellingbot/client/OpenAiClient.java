@@ -21,7 +21,7 @@ public class OpenAiClient {
     private final OpenAiChatModel chatModel;
     private final RetellingProperties retellingProperties;
 
-    public Flux<String> openAiCall(String contentToRetell) {
+    public Flux<String> retellingCall(String contentToRetell) {
         List<String> contentChunks = BigTextUtils.splitByWords(contentToRetell, WORDS_COUNT_THRESHOLD);
 
         return Flux.fromIterable(contentChunks)
