@@ -15,10 +15,11 @@ import static ru.panyukovnn.videoretellingbot.util.Constants.MAX_TG_MESSAGE_SIZE
 public class TgMessagePreparer {
 
     public List<String> prepareTgMessage(String content) {
-        String summaryWithoutHashSigns = changeHashSignsToBoldInMarkdown(content);
-        String escapedSymbolsSummary = prepareForMarkdownV2(summaryWithoutHashSigns);
+        String preparedMessage = changeHashSignsToBoldInMarkdown(content);
+//        preparedMessage = escapeSymoblsForMarkdownV2(preparedMessage);
+        preparedMessage = replaceDoubleStars(preparedMessage);
 
-        List<String> splitLongMessages = splitTooLongMessage(escapedSymbolsSummary);
+        List<String> splitLongMessages = splitTooLongMessage(preparedMessage);
 
         splitLongMessages.forEach(log::info);
 
@@ -73,9 +74,14 @@ public class TgMessagePreparer {
     }
 
 
-    protected String prepareForMarkdownV2(String message) {
-        String escapedMessage = message.replaceAll("([_\\[\\]\\(\\)~>#+\\-=|{}.!])", "\\\\$1");
+    protected String escapeSymoblsForMarkdownV2(String message) {
+        return message.replaceAll("([_\\[\\]\\(\\)~>#+\\-=|{}.!])", "\\\\$1");
+    }
 
-        return escapedMessage.replaceAll("\\*\\*", "*"); // заменяем двойные звездочки на одинарные, чтобы корректно отображалось выделение жирным
+    /**
+     * Заменяем двойные звездочки на одинарные, чтобы корректно отображалось выделение жирным
+     */
+    private static String replaceDoubleStars(String escapedMessage) {
+        return escapedMessage.replaceAll("\\*\\*", "*");
     }
 }
