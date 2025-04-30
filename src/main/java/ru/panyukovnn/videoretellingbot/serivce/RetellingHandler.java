@@ -20,7 +20,7 @@ public class RetellingHandler {
 
     public void handleRetelling(Long chatId, String inputMessage) {
         if (!YoutubeLinkHelper.isValidYoutubeUrl(inputMessage)) {
-            throw new RetellingException("824c", "Невалидная ссылка youtube");
+            throw new RetellingException("824c", "Невалидная ссылка youtube: " + inputMessage);
         }
 
         String cleanedYoutubeLink = YoutubeLinkHelper.removeRedundantQueryParamsFromYoutubeLint(inputMessage);

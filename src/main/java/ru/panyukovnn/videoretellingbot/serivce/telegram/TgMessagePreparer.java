@@ -73,8 +73,8 @@ public class TgMessagePreparer {
         return output.toString();
     }
 
-
-    protected String escapeSymoblsForMarkdownV2(String message) {
+    @Deprecated
+    protected String escapeSymbolsForMarkdownV2(String message) {
         return message.replaceAll("([_\\[\\]\\(\\)~>#+\\-=|{}.!])", "\\\\$1");
     }
 

@@ -1,5 +1,21 @@
 
 spring:
+  application:
+    name: retelling-bot
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      schema: retelling_bot
+      connection-init-sql: CREATE SCHEMA IF NOT EXISTS ${spring.datasource.hikari.schema};
+  liquibase:
+    enabled: true
+    change-log: ./db/changelog/changelog-master.yml
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
   ai:
     openai:
       api-key: ${DEEPSEEK_API_KEY}

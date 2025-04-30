@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: "01.create_clients.yml"
+      author: "Panyukov NN"
+      changes:
+        - createTable:
+            tableName: clients
+            remarks: "Информация о пользователе"
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: tg_user_id
+                  type: bigint
+                  remarks: "Идентификатор пользователя в телеграм"
+              - column:
+                  name: tg_last_chat_id
+                  type: bigint
+                  remarks: "Идентификатор чата, куда написал пользователь"
+              - column:
+                  name: username
+                  type: varchar
+                  remarks: "Логин"
+              - column:
+                  name: firstname
+                  type: varchar
+                  remarks: "Имя"
+              - column:
+                  name: lastname
+                  type: varchar
+                  remarks: "Фамилия"
+              - column:
+                  name: retellings_count
+                  type: bigint
+                  remarks: "Количество запросов на пересказ"
+              - column:
+                  name: create_time
+                  type: timestamp
+                  remarks: "Время создания"
+              - column:
+                  name: create_user
+                  type: varchar
+                  remarks: "Пользователь, который создал запись"
+              - column:
+                  name: last_update_time
+                  type: timestamp
+                  remarks: "Время последнего изменения"
+              - column:
+                  name: last_update_user
+                  type: varchar
+                  remarks: "Пользователь, который последним внес изменения"
