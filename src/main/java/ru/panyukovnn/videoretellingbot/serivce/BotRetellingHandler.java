@@ -6,17 +6,21 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import ru.panyukovnn.videoretellingbot.client.OpenAiClient;
 import ru.panyukovnn.videoretellingbot.exception.RetellingException;
+import ru.panyukovnn.videoretellingbot.model.loader.Content;
+import ru.panyukovnn.videoretellingbot.repository.ContentRepository;
+import ru.panyukovnn.videoretellingbot.serivce.loader.DataLoader;
 import ru.panyukovnn.videoretellingbot.serivce.telegram.TgSender;
 import ru.panyukovnn.videoretellingbot.util.YoutubeLinkHelper;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RetellingHandler {
+public class BotRetellingHandler {
 
     private final TgSender tgSender;
     private final OpenAiClient openAiClient;
-    private final YoutubeSubtitlesExtractor youtubeSubtitlesExtractor;
+    private final DataLoader youtubeSubtitlesLoader;
+    private final ContentRepository contentRepository;
 
     public void handleRetelling(Long chatId, String inputMessage) {
         if (!YoutubeLinkHelper.isValidYoutubeUrl(inputMessage)) {
@@ -27,7 +31,11 @@ public class RetellingHandler {
 
         tgSender.sendMessage(chatId, "Извлекаю содержание");
 
-        String subtitles = youtubeSubtitlesExtractor.extractYoutubeVideoSubtitles(cleanedYoutubeLink);
+        Content content = youtubeSubtitlesLoader.load(cleanedYoutubeLink);
+
+        contentRepository.save(content);
+
+        String subtitles = content.getContent();
 
         tgSender.sendMessage(chatId, "Формирую статью (это может занимать до 2х минут)");
 

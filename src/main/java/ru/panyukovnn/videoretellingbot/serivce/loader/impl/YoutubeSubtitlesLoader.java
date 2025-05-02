@@ -1,8 +1,14 @@
-package ru.panyukovnn.videoretellingbot.serivce;
+package ru.panyukovnn.videoretellingbot.serivce.loader.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import ru.panyukovnn.videoretellingbot.exception.RetellingException;
+import ru.panyukovnn.videoretellingbot.model.loader.Content;
+import ru.panyukovnn.videoretellingbot.model.loader.ContentType;
+import ru.panyukovnn.videoretellingbot.model.loader.Lang;
+import ru.panyukovnn.videoretellingbot.model.loader.Source;
+import ru.panyukovnn.videoretellingbot.serivce.loader.DataLoader;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,40 +25,56 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
-public class YoutubeSubtitlesExtractor {
+public class YoutubeSubtitlesLoader implements DataLoader {
 
     private static final String SUBTITLES_LANG_RU = "ru";
     private static final String SUBTITLES_LANG_EN = "en";
     private static final String SUBTITLES_DIRECTORY = "./subtitles/";
 
-    public String extractYoutubeVideoSubtitles(String videoUrl) {
-        log.info("Начинаю загрузку субтитров из youtube видео по ссылке: {}", videoUrl);
+    public Content load(String link) {
+        log.info("Начинаю загрузку субтитров из youtube видео по ссылке: {}", link);
 
         cleanSubtitlesFolder();
 
         try {
-            String subtitlesFilename = loadSubtitles(videoUrl);
+            Pair<String, Lang> subtitlesFilenameAndLangPair = loadSubtitles(link);
+            String subtitlesFilename = subtitlesFilenameAndLangPair.getFirst();
+            Lang lang = subtitlesFilenameAndLangPair.getSecond();
 
             File subtitlesFile = new File(SUBTITLES_DIRECTORY + subtitlesFilename);
 
             List<String> strings = Files.readAllLines(subtitlesFile.toPath());
             Set<String> cleanedFileLines = cleanSubtitles(strings);
 
-            return String.join("\n", cleanedFileLines);
+            String subtitles = String.join("\n", cleanedFileLines);
+
+            return Content.builder()
+                .link(link)
+                .lang(lang)
+                .type(ContentType.SUBTITLES)
+                .source(getSource())
+                .meta(null)
+                .content(subtitles)
+                .build();
         } catch (Exception e) {
             log.error("Ошибка загрузки субтитров из видео: {}", e.getMessage(), e);
 
-            throw new RetellingException("63e9", "Не удалось извлечь субтитры из видео");
+            throw new RetellingException("63e9", "Не удалось извлечь субтитры из видео", e);
         }
+    }
+
+    @Override
+    public Source getSource() {
+        return Source.YOUTUBE;
     }
 
     /**
      * Пытаемся загрузить субтитры с разными языками, при этом проверяем наличие как встроенных, так и автогенерируемых
      *
      * @param videoUrl ссылка на видео
-     * @return имя файла с загруженными субтитрами
+     * @return пара, где первый параметр - имя файла с загруженными субтитрами, второй параметр - язык
      */
-    private String loadSubtitles(String videoUrl) {
+    private Pair<String, Lang> loadSubtitles(String videoUrl) {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         try {
@@ -68,10 +90,10 @@ public class YoutubeSubtitlesExtractor {
                     Optional<String> optionalEnSubs = enSubtitles.getNow(Optional.empty());
                     Optional<String> optionalEnAutoGenSubs = autoGenEnSubtitles.getNow(Optional.empty());
 
-                    return optionalRuSubs
-                        .orElseGet(() -> optionalRuAutoGenSubs
-                            .orElseGet(() -> optionalEnSubs
-                                .orElseGet(() -> optionalEnAutoGenSubs
+                    return optionalRuSubs.map(it -> Pair.of(it, Lang.RU))
+                        .orElseGet(() -> optionalRuAutoGenSubs.map(it -> Pair.of(it, Lang.RU))
+                            .orElseGet(() -> optionalEnSubs.map(it -> Pair.of(it, Lang.EN))
+                                .orElseGet(() -> optionalEnAutoGenSubs.map(it -> Pair.of(it, Lang.EN))
                                     .orElseThrow(() -> new RetellingException("48ae", "Для указанного видео отсутствуют субтитры")))));
                 })
                 .get();

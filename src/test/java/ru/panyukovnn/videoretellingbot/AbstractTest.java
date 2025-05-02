@@ -8,7 +8,7 @@ import ru.panyukovnn.videoretellingbot.client.OpenAiClient;
 import ru.panyukovnn.videoretellingbot.config.TgBotApi;
 import ru.panyukovnn.videoretellingbot.listener.TgBotListener;
 import ru.panyukovnn.videoretellingbot.repository.ClientRepository;
-import ru.panyukovnn.videoretellingbot.serivce.YoutubeSubtitlesExtractor;
+import ru.panyukovnn.videoretellingbot.serivce.loader.impl.YoutubeSubtitlesLoader;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -24,5 +24,5 @@ public abstract class AbstractTest {
     @MockBean
     protected OpenAiClient openAiClient;
     @MockBean
-    protected YoutubeSubtitlesExtractor youtubeSubtitlesExtractor;
+    protected YoutubeSubtitlesLoader youtubeSubtitlesLoader;
 }

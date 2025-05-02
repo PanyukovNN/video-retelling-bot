@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import ru.panyukovnn.videoretellingbot.dto.UpdateParams;
 import ru.panyukovnn.videoretellingbot.exception.RetellingException;
 import ru.panyukovnn.videoretellingbot.serivce.ClientService;
-import ru.panyukovnn.videoretellingbot.serivce.RetellingHandler;
+import ru.panyukovnn.videoretellingbot.serivce.BotRetellingHandler;
 import ru.panyukovnn.videoretellingbot.serivce.telegram.TgSender;
 
 import java.time.Instant;
@@ -26,7 +26,7 @@ public class TgBotListener {
 
     private final TgSender tgSender;
     private final ClientService clientService;
-    private final RetellingHandler retellingHandler;
+    private final BotRetellingHandler botRetellingHandler;
 
     @Async("tgListenerExecutor")
     @EventListener(Update.class)
@@ -55,7 +55,7 @@ public class TgBotListener {
 
                 clientService.save(updateParams);
 
-                retellingHandler.handleRetelling(updateParams.getChatId(), updateParams.getInput());
+                botRetellingHandler.handleRetelling(updateParams.getChatId(), updateParams.getInput());
             } catch (RetellingException e) {
                 log.error("Ошибка бизнес логики. id: {}. Сообщение: {}", e.getId(), e.getMessage(), e);
 

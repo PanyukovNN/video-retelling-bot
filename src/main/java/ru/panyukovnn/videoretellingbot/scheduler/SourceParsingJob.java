@@ -1,0 +1,66 @@
+package ru.panyukovnn.videoretellingbot.scheduler;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import ru.panyukovnn.videoretellingbot.model.event.ProcessingEvent;
+import ru.panyukovnn.videoretellingbot.model.event.ProcessingEventType;
+import ru.panyukovnn.videoretellingbot.model.event.ProcessingStatus;
+import ru.panyukovnn.videoretellingbot.model.loader.Content;
+import ru.panyukovnn.videoretellingbot.model.loader.Source;
+import ru.panyukovnn.videoretellingbot.repository.ContentRepository;
+import ru.panyukovnn.videoretellingbot.repository.ProcessingEventRepository;
+import ru.panyukovnn.videoretellingbot.serivce.autodatafinder.AutoDataFinder;
+import ru.panyukovnn.videoretellingbot.serivce.loader.DataLoader;
+
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class SourceParsingJob {
+
+    private final DataLoader habrLoader;
+    private final AutoDataFinder habrDataFinder;
+    private final ContentRepository contentRepository;
+    private final ProcessingEventRepository processingEventRepository;
+
+    @Scheduled(cron = "${retelling.source-parsing-job.habr-cron}")
+    public void parseHabr() {
+        log.info("Запущен job загрузки статей с habr");
+
+        Content lastContent = contentRepository.findTopBySourceOrderByPublicationDateDesc(Source.HABR)
+            .orElse(null);
+
+        List<String> foundedLinks = habrDataFinder.findDataToLoad();
+
+        List<String> linksToLoad = defineLinksToLoad(foundedLinks, lastContent);
+
+        linksToLoad.forEach(link -> {
+            try {
+                Content content = habrLoader.load(link);
+
+                if (!processingEventRepository.existsByContentId(content.getId())) {
+                    processingEventRepository.save(ProcessingEvent.builder()
+                        .type(ProcessingEventType.RETELLING)
+                        .contentId(content.getId())
+                        .status(ProcessingStatus.NEW)
+                        .build());
+                }
+            } catch (Exception e) {
+                log.error("Ошибка при загрузке содержимого статьи с habr: " + e.getMessage(), e);
+            }
+        });
+    }
+
+    private List<String> defineLinksToLoad(List<String> foundedLinks, Content lastContent) {
+        if (lastContent != null && foundedLinks.contains(lastContent.getLink())) {
+            return foundedLinks.stream()
+                .dropWhile(link -> !link.equals(lastContent.getLink()))
+                .toList();
+        }
+
+        return foundedLinks;
+    }
+}

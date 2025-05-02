@@ -8,3 +8,9 @@ databaseChangeLog:
   - include:
       file: 01.create_clients.yml
       relativeToChangelogFile: true
+  - include:
+      file: 02.create_contents.yml
+      relativeToChangelogFile: true
+  - include:
+      file: 03.processing_events.yml
+      relativeToChangelogFile: true
