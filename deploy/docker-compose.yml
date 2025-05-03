@@ -1,11 +1,11 @@
 version: '3.3'
 
 services:
-  reminder:
-    build: .
-    container_name: video-retelling-bot
+  retelling-bot:
+    image: ghcr.io/panyukovnn/retelling-bot:latest
+    container_name: retelling-bot
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
-      - deploy/config.env
+      - config.env
       - ~/common-config/config.env

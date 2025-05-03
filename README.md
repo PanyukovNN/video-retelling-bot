@@ -16,3 +16,24 @@
 - сохраняет в таблицу processing_events - задачу на пересказ
 
 - запускается регулярный job пересказа - извлекает 
+
+---
+
+### Init сервера
+
+1. Создаем docker-compose.yml, помещаем его в /deploy
+2. Создаем файл config.yml с секретными конфигурациями для репозитория
+3. Выполняем скрипт init-server.sh из папки /deploy 
+4. Заходим на сервер 
+5. Выполняем аутентификацию в Github Packages:
+
+`echo YOUR_GITHUB_TOKEN | docker login ghcr.io -u YOUR_USERNAME --password-stdin`
+
+где YOUR_GITHUB_TOKEN - pat с правами read:packages
+
+### Deploy
+
+1. Залить изменения в ветку main
+2. Навесить тег
+3. Дождаться уведомления в телеграм, об успешной сборке 
+4. Запустить deploy-remote.sh скрипт из папки /deploy

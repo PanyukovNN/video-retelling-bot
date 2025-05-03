@@ -40,4 +40,4 @@ bin/
 
 **application-localdev.properties
 .subtitles/
-./deploy/config.env
+/deploy/config.env

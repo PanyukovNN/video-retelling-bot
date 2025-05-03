@@ -1,1 +1,1 @@
-ssh nvpn "cd video-retelling-bot/deploy; sh deploy.sh"
+ssh nvpn "cd retelling-bot; sh docker compose up -d"
