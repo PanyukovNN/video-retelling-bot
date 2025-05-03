@@ -33,11 +33,11 @@ jobs:
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.NOTIFICATION_TELEGRAM_BOT_TOKEN }}/sendMessage \
             -d chat_id=${{ secrets.NOTIFICATION_TELEGRAM_CHAT_ID }} \
-            -d text="✅ Retelling Bot tests успешно выполнен в репозитории ${{ github.repository }} на ветке ${{ github.ref }}."
+            -d text="✅ retelling-bot \n Успешно отработали тесты для ${{ github.ref_name }}."
 
       - name: Notify Telegram on failure
         if: failure()
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.NOTIFICATION_TELEGRAM_BOT_TOKEN }}/sendMessage \
             -d chat_id=${{ secrets.NOTIFICATION_TELEGRAM_CHAT_ID }} \
-            -d text="❌ Ошибка в CI для ${{ github.repository }} на ветке ${{ github.ref_name }}. Проверь лог: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            -d text="❌ retelling-bot \n Ошибка при выполнении тестов для ${{ github.ref_name }} \n Посмотреть лог: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

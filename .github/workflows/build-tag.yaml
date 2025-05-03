@@ -43,11 +43,11 @@ jobs:
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.NOTIFICATION_TELEGRAM_BOT_TOKEN }}/sendMessage \
             -d chat_id=${{ secrets.NOTIFICATION_TELEGRAM_CHAT_ID }} \
-            -d text="✅ Retelling Bot Успешно выполнена сборка тега ${{ github.ref_name }}."
+            -d text="✅ retelling-bot \n Успешно выполнена сборка тега ${{ github.ref_name }}."
 
       - name: Notify Telegram on failure
         if: failure()
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.NOTIFICATION_TELEGRAM_BOT_TOKEN }}/sendMessage \
             -d chat_id=${{ secrets.NOTIFICATION_TELEGRAM_CHAT_ID }} \
-            -d text="❌ ${{ github.repository }} Ошибка при сборке тега ${{ github.ref_name }}. Посмотреть лог: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            -d text="❌ retelling-bot \n Ошибка при сборке тега ${{ github.ref_name }} \n Посмотреть лог: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
