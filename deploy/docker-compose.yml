@@ -7,5 +7,5 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
-      - config.env
+      - ./config.env
       - ~/common-config/config.env

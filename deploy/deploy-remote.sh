@@ -1,1 +1,14 @@
-ssh nvpn "cd retelling-bot; sh docker compose up -d"
+#!/bin/bash
+
+SSH_CONFIG=nvpn
+REMOTE_DIR=retelling-bot
+
+# Команда для выполнения на сервере
+REMOTE_CMD="
+cd $REMOTE_DIR && \
+docker compose down -v && \
+docker compose up -d
+"
+
+# Подключение и выполнение
+ssh "$SSH_CONFIG" "$REMOTE_CMD"

@@ -10,7 +10,7 @@ COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
 ENV_FILE="$SCRIPT_DIR/config.env"
 
 if [[ ! -f "$COMPOSE_FILE" || ! -f "$ENV_FILE" ]]; then
-  echo "Ошибка: не найден docker-compose.yaml или config.env рядом со скриптом."
+  echo "Ошибка: не найден docker-compose.yml или config.env рядом со скриптом."
   exit 1
 fi
 
