@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   retelling-bot:
-    image: ghcr.io/panyukovnn/retelling-bot:latest
+    image: ghcr.io/panyukovnn/retelling-bot:${APP_TAG}
     container_name: retelling-bot
     extra_hosts:
       - "host.docker.internal:host-gateway"
