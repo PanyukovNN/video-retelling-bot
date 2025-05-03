@@ -26,13 +26,12 @@ public class SourceParsingJob {
     private final ContentRepository contentRepository;
     private final ProcessingEventRepository processingEventRepository;
 
-    @Scheduled(cron = "${retelling.source-parsing-job.habr-cron}")
+    @Scheduled(cron = "${retelling.scheduled-jobs.source-parsing.habr-cron}", scheduler = "sourceParsingScheduler")
     public void parseHabr() {
         log.info("Запущен job загрузки статей с habr");
 
         Content lastContent = contentRepository.findTopBySourceOrderByPublicationDateDesc(Source.HABR)
             .orElse(null);
-
         List<String> foundedLinks = habrDataFinder.findDataToLoad();
 
         List<String> linksToLoad = defineLinksToLoad(foundedLinks, lastContent);
@@ -54,7 +53,7 @@ public class SourceParsingJob {
         });
     }
 
-    private List<String> defineLinksToLoad(List<String> foundedLinks, Content lastContent) {
+    protected List<String> defineLinksToLoad(List<String> foundedLinks, Content lastContent) {
         if (lastContent != null && foundedLinks.contains(lastContent.getLink())) {
             return foundedLinks.stream()
                 .dropWhile(link -> !link.equals(lastContent.getLink()))

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.panyukovnn.videoretellingbot.serivce.autodatafinder.AutoDataFinder;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -37,14 +38,14 @@ public class HabrDataFinder implements AutoDataFinder {
 
             Elements articleBlocks = doc.select("div.tm-article-snippet");
 
-            LocalDateTime dayBefore = LocalDateTime.now().minusDays(1);
+            LocalDateTime dayBefore = LocalDateTime.now(ZoneOffset.UTC).minusDays(1);
 
             return articleBlocks.stream()
                 .takeWhile(article -> {
                     // Извлекаем и проверяем дату и время
                     String rawDateTime = article.selectFirst("time").attribute("datetime").getValue();
-                    // TODO уточнить как будет отображаться время с сервера в Нидерландах
-                    LocalDateTime parsedDateTime = ZonedDateTime.parse(rawDateTime).toLocalDateTime();
+
+                    LocalDateTime parsedDateTime = ZonedDateTime.parse(rawDateTime).toLocalDateTime(); // в UTC
 
                     return parsedDateTime.isAfter(dayBefore);
                 })
