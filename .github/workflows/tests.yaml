@@ -27,3 +27,17 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test
+
+      - name: Notify Telegram on success
+        if: success()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.NOTIFICATION_TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.NOTIFICATION_TELEGRAM_CHAT_ID }} \
+            -d text="✅ Retelling Bot tests успешно выполнен в репозитории ${{ github.repository }} на ветке ${{ github.ref }}."
+
+      - name: Notify Telegram on failure
+        if: failure()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.NOTIFICATION_TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.NOTIFICATION_TELEGRAM_CHAT_ID }} \
+            -d text="❌ Ошибка в CI для ${{ github.repository }} на ветке ${{ github.ref_name }}. Проверь лог: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
