@@ -7,7 +7,7 @@ REMOTE_DIR=retelling-bot
 REMOTE_CMD="
 cd $REMOTE_DIR && \
 docker compose down -v && \
-APP_TAG=1.0.0-RC6 docker compose up -d
+APP_TAG=1.0.0-RC7 docker compose up -d
 "
 
 # Подключение и выполнение

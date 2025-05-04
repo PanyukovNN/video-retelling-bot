@@ -1,12 +1,14 @@
 name: Release Docker Image
 
 on:
-  push:
-    tags:
-      - '*'
+  workflow_run:
+    workflows: [ "Run Gradle Tests" ]
+    types:
+      - completed
 
 jobs:
   build-and-publish:
+    if: startsWith(github.ref, 'refs/tags/') # Запускаем только если навешен тег
     runs-on: ubuntu-latest
 
     permissions:
