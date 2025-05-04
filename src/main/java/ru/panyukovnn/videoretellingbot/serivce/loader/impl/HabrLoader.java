@@ -12,6 +12,7 @@ import ru.panyukovnn.videoretellingbot.model.loader.Lang;
 import ru.panyukovnn.videoretellingbot.model.loader.Source;
 import ru.panyukovnn.videoretellingbot.repository.ContentRepository;
 import ru.panyukovnn.videoretellingbot.serivce.loader.DataLoader;
+import ru.panyukovnn.videoretellingbot.util.LanguageUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -41,12 +42,11 @@ public class HabrLoader implements DataLoader {
             String rawDateTime = doc.select("span.tm-article-datetime-published > time").attr("datetime");
             String articleContent = doc.select("div.tm-article-body").text();
 
-            // TODO уточнить как будет отображаться время с сервера в Нидерландах
             LocalDateTime parsedDateTime = ZonedDateTime.parse(rawDateTime).toLocalDateTime();
 
             Content content = Content.builder()
                 .link(link)
-                .lang(Lang.RU) // TODO не гарантированно
+                .lang(LanguageUtils.detectLangByLettersCount(articleContent))
                 .type(ContentType.ARTICLE)
                 .source(getSource())
                 .title(title)

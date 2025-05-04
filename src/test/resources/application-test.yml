@@ -12,3 +12,6 @@ retelling:
       habr-cron: "-"
     retelling:
       cron: "-"
+  data-finder:
+    habr:
+      period-of-days-to-look-for: 10_000_000 # Потенциально бесконечное количество дней, чтобы не зависеть от текущей даты в тестах

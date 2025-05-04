@@ -72,7 +72,7 @@ public class TgBotListener {
         return CompletableFuture.completedFuture(null);
     }
 
-    private Optional<UpdateParams> crateUpdateParams(Update update) {
+    protected Optional<UpdateParams> crateUpdateParams(Update update) {
         if (update.hasCallbackQuery()) {
             User user = update.getCallbackQuery().getFrom();
 
@@ -104,7 +104,7 @@ public class TgBotListener {
             null));
     }
 
-    private String formatFullUserName(UpdateParams updateParams) {
+    protected String formatFullUserName(UpdateParams updateParams) {
         if (updateParams == null) {
             return "";
         }
