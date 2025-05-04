@@ -2,7 +2,7 @@ FROM amazoncorretto:17.0.7-alpine AS BUILD_IMAGE
 
 COPY . ./
 
-RUN ./gradlew build -x test
+RUN ./gradlew build
 
 # ---
 
