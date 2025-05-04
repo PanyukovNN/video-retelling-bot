@@ -42,7 +42,7 @@ public class SourceParsingJob {
 
                 if (!processingEventRepository.existsByContentId(content.getId())) {
                     processingEventRepository.save(ProcessingEvent.builder()
-                        .type(ProcessingEventType.RETELLING)
+                        .type(ProcessingEventType.RATE_RAW_MATERIAL)
                         .contentId(content.getId())
                         .status(ProcessingStatus.NEW)
                         .build());

@@ -56,8 +56,6 @@ test {
 }
 
 jacocoTestReport {
-    dependsOn test // tests are required to run before generating the report
-
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: [
@@ -73,7 +71,7 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.40 // 30% минимальное покрытие
+                minimum = 0.50 // 30% минимальное покрытие
             }
         }
     }

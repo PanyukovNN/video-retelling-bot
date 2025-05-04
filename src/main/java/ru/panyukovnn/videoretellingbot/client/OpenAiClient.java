@@ -6,7 +6,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import ru.panyukovnn.videoretellingbot.property.RetellingProperties;
+import ru.panyukovnn.videoretellingbot.property.PromptProperties;
 import ru.panyukovnn.videoretellingbot.util.BigTextUtils;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class OpenAiClient {
     public static final int WORDS_COUNT_THRESHOLD = 25000;
 
     private final OpenAiChatModel chatModel;
-    private final RetellingProperties retellingProperties;
+    private final PromptProperties promptProperties;
 
     public Flux<String> retellingCall(String contentToRetell) {
         List<String> contentChunks = BigTextUtils.splitByWords(contentToRetell, WORDS_COUNT_THRESHOLD);
@@ -31,7 +31,7 @@ public class OpenAiClient {
     private Flux<String> call(String contentToRetell) {
         log.info("Отправляю запрос в AI");
 
-        return chatModel.stream(new Prompt(retellingProperties.getPromptPrefix() + "\n\n" + contentToRetell))
+        return chatModel.stream(new Prompt(promptProperties.getRetelling() + "\n\n" + contentToRetell))
                 .map(chatResponse -> chatResponse.getResult().getOutput().getText());
     }
 }

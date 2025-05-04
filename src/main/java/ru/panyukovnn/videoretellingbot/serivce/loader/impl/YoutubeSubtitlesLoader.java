@@ -1,5 +1,6 @@
 package ru.panyukovnn.videoretellingbot.serivce.loader.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import ru.panyukovnn.videoretellingbot.model.loader.Content;
 import ru.panyukovnn.videoretellingbot.model.loader.ContentType;
 import ru.panyukovnn.videoretellingbot.model.loader.Lang;
 import ru.panyukovnn.videoretellingbot.model.loader.Source;
+import ru.panyukovnn.videoretellingbot.serivce.YtDlpProcessBuilderCreator;
 import ru.panyukovnn.videoretellingbot.serivce.loader.DataLoader;
 
 import java.io.BufferedReader;
@@ -25,11 +27,14 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class YoutubeSubtitlesLoader implements DataLoader {
 
     private static final String SUBTITLES_LANG_RU = "ru";
     private static final String SUBTITLES_LANG_EN = "en";
     private static final String SUBTITLES_DIRECTORY = "./subtitles/";
+
+    private final YtDlpProcessBuilderCreator ytDlpProcessBuilderCreator;
 
     public Content load(String link) {
         log.info("Начинаю загрузку субтитров из youtube видео по ссылке: {}", link);
@@ -133,19 +138,7 @@ public class YoutubeSubtitlesLoader implements DataLoader {
     private Optional<String> tryDownloadSubtitles(String videoUrl, String lang, boolean isAutoSubs) {
         String outputFileName = "subtitles-" + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME) + "-" + UUID.randomUUID().toString().substring(0, 8);
 
-        ProcessBuilder builder = new ProcessBuilder(
-            "./yt-dlp/" + defineYtDlpExecutableFileName(),
-            isAutoSubs ? "--write-auto-subs" : "--write-subs",
-            "--sub-lang", lang,
-            "--sub-format", "vtt",
-            "--skip-download",
-            "-o", SUBTITLES_DIRECTORY + outputFileName,
-            videoUrl
-        );
-
-        // Рабочая директория (куда сохраняются субтитры)
-        builder.directory(new File("."));
-        builder.redirectErrorStream(true);
+        ProcessBuilder builder = ytDlpProcessBuilderCreator.createProcessBuilder(videoUrl, lang, isAutoSubs, SUBTITLES_DIRECTORY + outputFileName);
 
         try {
             log.info("Начало загрузки субтитров для видео: {}", videoUrl);
@@ -198,19 +191,5 @@ public class YoutubeSubtitlesLoader implements DataLoader {
         return uniqueLines;
     }
 
-    private static String defineYtDlpExecutableFileName() {
-        String osName = System.getProperty("os.name").toLowerCase();
 
-        if (osName.contains("mac")) {
-            return "yt-dlp_macos";
-        } else if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) {
-            String arch = System.getProperty("os.arch").toLowerCase();
-
-            return arch.contains("aarch64") || arch.contains("arm64")
-                ? "yt-dlp_linux_aarch64"
-                : "yt-dlp_linux";
-        }
-
-        throw new RetellingException("4824", "Не удалось определить подходящий yt-dlp исполняемый файл для системы: " + osName);
-    }
 }

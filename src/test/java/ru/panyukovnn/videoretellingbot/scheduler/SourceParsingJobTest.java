@@ -61,7 +61,7 @@ public class SourceParsingJobTest {
         verify(mockHabrDataFinder).findDataToLoad();
         verify(mockHabrLoader).load("https://habr.com/article/2");
         verify(mockProcessingEventRepository).save(argThat(event ->
-                event.getType() == ProcessingEventType.RETELLING &&
+                event.getType() == ProcessingEventType.RATE_RAW_MATERIAL &&
                 event.getStatus() == ProcessingStatus.NEW
         ));
     }

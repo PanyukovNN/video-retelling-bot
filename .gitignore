@@ -41,3 +41,4 @@ bin/
 **application-localdev.properties
 .subtitles/
 /deploy/config.env
+/src/main/resources/application-localdev.yaml
