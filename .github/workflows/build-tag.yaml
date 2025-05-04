@@ -1,10 +1,9 @@
 name: Release Docker Image
 
 on:
-  workflow_run:
-    workflows: [ "Run Gradle Tests" ]
-    types:
-      - completed
+  push:
+    tags:
+      - '*'
 
 jobs:
   build-and-publish:
