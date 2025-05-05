@@ -17,7 +17,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.NVPN_SSH_PRIVATE_KEY }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
           SSH_USER: ${{ secrets.NVPN_SSH_USER }}
-          IMAGE_TAG: ${{ github.inputs.image_tag }}
+          IMAGE_TAG: ${{ github.event.inputs.image_tag }}
           REMOTE_DIR: retelling-bot
         run: |
           # Подключаемся к серверу и выполняем скрипт
