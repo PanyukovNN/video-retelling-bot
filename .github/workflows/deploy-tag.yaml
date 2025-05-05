@@ -18,13 +18,11 @@ jobs:
           SERVER_IP: ${{ secrets.SERVER_IP }}
           SSH_USER: ${{ secrets.NVPN_SSH_USER }}
           IMAGE_TAG: ${{ github.inputs.image_tag }}
-          GHCR_USER: ${{ github.actor }}
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REMOTE_DIR: retelling-bot
         run: |
           # Подключаемся к серверу и выполняем скрипт
-          echo "$NVPN_SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${NVPN_SSH_USER}@${SERVER_IP} "
+          echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${SSH_USER}@${SERVER_IP} "
             cd $REMOTE_DIR
             docker compose down -v
             APP_TAG=\"$IMAGE_TAG\" docker compose up -d
