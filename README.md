@@ -21,6 +21,20 @@
 
 ### Init сервера
 
+#### Регистрация нового пользователя
+
+1. `ssh root@<ip>`
+2. `groupadd panyukovnn`
+3. `useradd -d /home/tech -m -s /bin/bash -g panyukovnn tech`
+4. `passwd tech`
+5. зайти на сервер под учетной записью tech
+6. настраиваем ssh
+7. из под root'а даём права на docker: `sudo usermod -aG docker tech`
+
+#### Подготавливаем файлы
+
+- бд развернута на том же сервере в docker-container, конфигруаия для подключения к бд хранится в /etc/common-config
+
 1. Создаем docker-compose.yml, помещаем его в /deploy
 2. Создаем файл config.yml с секретными конфигурациями для репозитория
 3. Выполняем скрипт init-server.sh из папки /deploy 
@@ -36,5 +50,4 @@
 1. Залить изменения в ветку main
 2. Навесить тег
 3. Дождаться уведомления в телеграм, об успешной сборке 
-4. Прописать тег в APP_TAG в файле deploy-remote.sh скрипте из папки /deploy 
-5. Запустить deploy-remote.sh 
+4. Запусить github workflow deploy-tag

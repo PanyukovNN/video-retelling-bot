@@ -8,4 +8,4 @@ services:
       - "host.docker.internal:host-gateway"
     env_file:
       - ./config.env
-      - ~/common-config/config.env
+      - /etc/common-config/config.env

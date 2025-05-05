@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Конфигурация
-SSH_CONFIG=nvpn
+SSH_CONFIG=nvpnt
 REMOTE_DIR=retelling-bot
 
 # Проверка на наличие файлов рядом со скриптом
