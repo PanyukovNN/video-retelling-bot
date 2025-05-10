@@ -10,8 +10,11 @@ retelling:
   scheduled-jobs:
     source-parsing:
       habr-cron: "-"
-    retelling:
+    event-processing:
       cron: "-"
+  publishing:
+    chat-id: 1
+    thread-id: 2
   data-finder:
     habr:
       period-of-days-to-look-for: 10_000_000 # Потенциально бесконечное количество дней, чтобы не зависеть от текущей даты в тестах

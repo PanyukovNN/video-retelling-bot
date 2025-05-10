@@ -27,8 +27,8 @@ class TgBotListenerTest extends AbstractTest {
     void when_onUpdate_then_success() throws ExecutionException, InterruptedException {
         Update update = createUpdate();
 
-        when(openAiClient.retellingCall(any()))
-            .thenReturn(Flux.just("test"));
+        when(openAiClient.retellingBlockingCall(any(), any(), any()))
+            .thenReturn("test");
 
         tgBotListener.onUpdate(update).get();
 

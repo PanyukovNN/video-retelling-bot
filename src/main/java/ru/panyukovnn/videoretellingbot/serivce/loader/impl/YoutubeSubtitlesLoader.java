@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import ru.panyukovnn.videoretellingbot.exception.RetellingException;
-import ru.panyukovnn.videoretellingbot.model.loader.Content;
-import ru.panyukovnn.videoretellingbot.model.loader.ContentType;
-import ru.panyukovnn.videoretellingbot.model.loader.Lang;
-import ru.panyukovnn.videoretellingbot.model.loader.Source;
-import ru.panyukovnn.videoretellingbot.serivce.YtDlpProcessBuilderCreator;
+import ru.panyukovnn.videoretellingbot.model.content.Content;
+import ru.panyukovnn.videoretellingbot.model.content.ContentType;
+import ru.panyukovnn.videoretellingbot.model.content.Lang;
+import ru.panyukovnn.videoretellingbot.model.content.Source;
+import ru.panyukovnn.videoretellingbot.util.YtDlpProcessBuilderCreator;
 import ru.panyukovnn.videoretellingbot.serivce.loader.DataLoader;
 
 import java.io.BufferedReader;

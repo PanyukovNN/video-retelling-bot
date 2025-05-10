@@ -25,9 +25,10 @@ public class ProcessingEvent {
     @Enumerated(EnumType.STRING)
     private ProcessingEventType type;
     /**
-     * Идентификатор контента
+     * Идентификатор сущности
+     * Может быть как материал, так и пересказ, в зависимости от текущего этапа
      */
-    private UUID contentId;
+    private UUID baseId;
     /**
      * Статус обработки
      */

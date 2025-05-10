@@ -1,4 +1,4 @@
-package ru.panyukovnn.videoretellingbot.serivce;
+package ru.panyukovnn.videoretellingbot.serivce.bot;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

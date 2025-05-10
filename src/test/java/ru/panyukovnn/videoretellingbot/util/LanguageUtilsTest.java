@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.panyukovnn.videoretellingbot.model.loader.Lang;
+import ru.panyukovnn.videoretellingbot.model.content.Lang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

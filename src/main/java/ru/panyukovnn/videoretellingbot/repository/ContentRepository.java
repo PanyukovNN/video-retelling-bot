@@ -1,8 +1,8 @@
 package ru.panyukovnn.videoretellingbot.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.panyukovnn.videoretellingbot.model.loader.Content;
-import ru.panyukovnn.videoretellingbot.model.loader.Source;
+import ru.panyukovnn.videoretellingbot.model.content.Content;
+import ru.panyukovnn.videoretellingbot.model.content.Source;
 
 import java.util.Optional;
 import java.util.UUID;

@@ -6,7 +6,6 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import ru.panyukovnn.videoretellingbot.property.PromptProperties;
 import ru.panyukovnn.videoretellingbot.util.BigTextUtils;
 
 import java.util.List;
@@ -19,19 +18,31 @@ public class OpenAiClient {
     public static final int WORDS_COUNT_THRESHOLD = 25000;
 
     private final OpenAiChatModel chatModel;
-    private final PromptProperties promptProperties;
 
-    public Flux<String> retellingCall(String contentToRetell) {
+    public Flux<String> retellingCall(String prompt, String contentToRetell) {
         List<String> contentChunks = BigTextUtils.splitByWords(contentToRetell, WORDS_COUNT_THRESHOLD);
 
         return Flux.fromIterable(contentChunks)
-            .flatMap(this::call);
+            .flatMap(contentChunk -> call(prompt, contentChunk));
     }
 
-    private Flux<String> call(String contentToRetell) {
+    public String retellingBlockingCall(String requestType, String prompt, String contentToRetell) {
+        return blockingCall(requestType, prompt, contentToRetell);
+    }
+
+    private Flux<String> call(String prompt, String contentToRetell) {
         log.info("Отправляю запрос в AI");
 
-        return chatModel.stream(new Prompt(promptProperties.getRetelling() + "\n\n" + contentToRetell))
+        return chatModel.stream(new Prompt(prompt + "\n\n" + contentToRetell))
                 .map(chatResponse -> chatResponse.getResult().getOutput().getText());
+    }
+
+    private String blockingCall(String requestType, String prompt, String contentToRetell) {
+        log.info("Отправляю запрос в AI для: {}", requestType);
+
+        return chatModel.call(new Prompt(prompt + "\n\n" + contentToRetell))
+            .getResult()
+            .getOutput()
+            .getText();
     }
 }

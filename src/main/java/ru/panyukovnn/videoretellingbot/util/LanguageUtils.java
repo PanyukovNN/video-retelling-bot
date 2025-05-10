@@ -3,7 +3,7 @@ package ru.panyukovnn.videoretellingbot.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
-import ru.panyukovnn.videoretellingbot.model.loader.Lang;
+import ru.panyukovnn.videoretellingbot.model.content.Lang;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LanguageUtils {

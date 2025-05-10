@@ -8,10 +8,10 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.transaction.annotation.Transactional;
 import ru.panyukovnn.videoretellingbot.AbstractTest;
-import ru.panyukovnn.videoretellingbot.model.loader.Content;
-import ru.panyukovnn.videoretellingbot.model.loader.ContentType;
-import ru.panyukovnn.videoretellingbot.model.loader.Lang;
-import ru.panyukovnn.videoretellingbot.model.loader.Source;
+import ru.panyukovnn.videoretellingbot.model.content.Content;
+import ru.panyukovnn.videoretellingbot.model.content.ContentType;
+import ru.panyukovnn.videoretellingbot.model.content.Lang;
+import ru.panyukovnn.videoretellingbot.model.content.Source;
 import ru.panyukovnn.videoretellingbot.testutils.TestFileUtil;
 
 import java.io.IOException;

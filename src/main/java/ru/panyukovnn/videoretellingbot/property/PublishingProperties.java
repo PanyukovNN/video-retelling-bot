@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "retelling.prompt")
-public class PromptProperties {
+@ConfigurationProperties(prefix = "retelling.publishing")
+public class PublishingProperties {
 
-    private String retelling;
-    private String rateMaterial;
+    private Long chatId;
+    private Integer threadId;
 }

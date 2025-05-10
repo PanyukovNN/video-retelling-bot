@@ -9,5 +9,17 @@ public enum ProcessingEventType {
     /**
      * Задача на пересказ
      */
-    RETELLING
+    RETELLING,
+    /**
+     * Задача на публикацию пересказа
+     */
+    PUBLISH_RETELLING,
+    /**
+     * Опубликован, терминальный статус
+     */
+    PUBLISHED,
+    /**
+     * Ошибка публикации, терминальный статус
+     */
+    PUBLICATION_ERROR
 }

@@ -14,3 +14,12 @@ databaseChangeLog:
   - include:
       file: 03.processing_events.yml
       relativeToChangelogFile: true
+  - include:
+      file: 04.create_content_rate.yml
+      relativeToChangelogFile: true
+  - include:
+      file: 05.create_retellings.yml
+      relativeToChangelogFile: true
+  - include:
+      file: 06.update_processing_event.yml
+      relativeToChangelogFile: true

@@ -21,15 +21,20 @@ public class TgSender {
     private final TgMessagePreparer tgMessagePreparer;
 
     public void sendMessage(Long chatId, String message) {
-        List<String> splitLongMessages = tgMessagePreparer.prepareTgMessage(message);
-
-        splitLongMessages.forEach(splitMessage -> executeSendMessage(chatId, splitMessage));
+        sendMessage(chatId, null, message);
     }
 
-    private void executeSendMessage(Long chatId, String message) {
+    public void sendMessage(Long chatId, Integer messageThreadId, String message) {
+        List<String> splitLongMessages = tgMessagePreparer.prepareTgMessage(message);
+
+        splitLongMessages.forEach(splitMessage -> executeSendMessage(chatId, messageThreadId, splitMessage));
+    }
+
+    private void executeSendMessage(Long chatId, Integer messageThreadId, String message) {
         try {
             botApi.execute(SendMessage.builder()
                 .chatId(chatId)
+                .messageThreadId(messageThreadId)
                 .disableWebPagePreview(true)
                 .parseMode("Markdown")
                 .text(message)

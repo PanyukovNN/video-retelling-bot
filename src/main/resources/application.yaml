@@ -34,8 +34,11 @@ retelling:
   scheduled-jobs:
     source-parsing:
       habr-cron: 0 0 * * * *
-    retelling:
+    event-processing:
       cron: 0 * * * * *
+  publishing:
+    chat-id: ${PUBLISHING_CHAT_ID}
+    thread-id: ${PUBLISHING_THREAD_ID}
   data-finder:
     habr:
       period-of-days-to-look-for: 1

@@ -1,4 +1,4 @@
-package ru.panyukovnn.videoretellingbot.model.loader;
+package ru.panyukovnn.videoretellingbot.model.content;
 
 public enum ContentType {
 

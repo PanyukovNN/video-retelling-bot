@@ -1,12 +1,12 @@
-package ru.panyukovnn.videoretellingbot.serivce;
+package ru.panyukovnn.videoretellingbot.serivce.bot;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 import ru.panyukovnn.videoretellingbot.client.OpenAiClient;
 import ru.panyukovnn.videoretellingbot.exception.RetellingException;
-import ru.panyukovnn.videoretellingbot.model.loader.Content;
+import ru.panyukovnn.videoretellingbot.model.content.Content;
+import ru.panyukovnn.videoretellingbot.property.PromptProperties;
 import ru.panyukovnn.videoretellingbot.repository.ContentRepository;
 import ru.panyukovnn.videoretellingbot.serivce.loader.DataLoader;
 import ru.panyukovnn.videoretellingbot.serivce.telegram.TgSender;
@@ -20,6 +20,7 @@ public class BotRetellingHandler {
     private final TgSender tgSender;
     private final OpenAiClient openAiClient;
     private final DataLoader youtubeSubtitlesLoader;
+    private final PromptProperties promptProperties;
     private final ContentRepository contentRepository;
 
     public void handleRetelling(Long chatId, String inputMessage) {
@@ -39,24 +40,20 @@ public class BotRetellingHandler {
 
         tgSender.sendMessage(chatId, "Формирую статью (это может занимать до 2х минут)");
 
-        openAiClient.retellingCall(subtitles)
-            .reduce(new StringBuilder(), StringBuilder::append)
-            .map(StringBuilder::toString)
-            .doOnNext(videoSummary -> tgSender.sendMessage(chatId, videoSummary))
-            .onErrorResume(e -> e instanceof RetellingException, e -> {
-                log.error("Ошибка бизнес логики. id: {}. Сообщение: {}", ((RetellingException) e).getId(), e.getMessage(), e);
+        String retellingResponse = openAiClient.retellingBlockingCall("retelling_from_bot", promptProperties.getRetelling(), subtitles);
 
-                tgSender.sendMessage(chatId, "В процессе работы возникла ошибка: " + e.getMessage());
+        try {
+            tgSender.sendMessage(chatId, retellingResponse);
 
-                return Mono.empty();
-            })
-            .onErrorResume(e -> {
-                log.error(e.getMessage(), e);
+            log.info("Пересказ успешно выполнен и доставлен");
+        } catch (RetellingException e) {
+            log.warn("Ошибка бизнес логики. id: {}. Сообщение: {}", ((RetellingException) e).getId(), e.getMessage(), e);
 
-                tgSender.sendMessage(chatId, "Непредвиденная ошибка при отправке сообщения");
+            tgSender.sendMessage(chatId, "В процессе работы возникла ошибка: " + e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
 
-                return Mono.empty();
-            })
-            .subscribe(o -> log.info("Пересказ успешно выполнен и доставлен"));
+            tgSender.sendMessage(chatId, "Непредвиденная ошибка при отправке сообщения");
+        }
     }
 }

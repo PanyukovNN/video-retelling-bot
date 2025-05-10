@@ -1,4 +1,4 @@
-package ru.panyukovnn.videoretellingbot.serivce;
+package ru.panyukovnn.videoretellingbot.util;
 
 import org.springframework.stereotype.Service;
 import ru.panyukovnn.videoretellingbot.exception.RetellingException;
