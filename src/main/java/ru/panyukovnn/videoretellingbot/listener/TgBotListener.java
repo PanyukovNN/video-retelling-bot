@@ -40,6 +40,12 @@ public class TgBotListener {
                 return CompletableFuture.completedFuture(null);
             }
 
+            if (!Objects.equals(updateParams.getChatId(), updateParams.getUserId())) {
+                log.warn("Получено сообщение не из приватного чата: {}", updateParams);
+
+                return CompletableFuture.completedFuture(null);
+            }
+
             MDC.clear();
             MDC.put("input", updateParams.getInput());
             MDC.put("userId", String.valueOf(updateParams.getUserId()));

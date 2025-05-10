@@ -33,7 +33,7 @@ public class PublishRetellingEventProcessorImpl implements EventProcessor {
 
     @Override
     public void process(ProcessingEvent processingEvent) {
-        Retelling retelling = retellingRepository.findById(processingEvent.getBaseId())
+        Retelling retelling = retellingRepository.findById(processingEvent.getRetellingId())
             .orElse(null);
 
         if (retelling == null) {

@@ -27,7 +27,7 @@ public class RetellingEventProcessorImpl implements EventProcessor {
 
     @Override
     public void process(ProcessingEvent processingEvent) {
-        Content content = contentRepository.findById(processingEvent.getBaseId())
+        Content content = contentRepository.findById(processingEvent.getContentId())
             .orElse(null);
 
         if (content == null) {
@@ -51,7 +51,7 @@ public class RetellingEventProcessorImpl implements EventProcessor {
         );
 
         processingEvent.setType(ProcessingEventType.PUBLISH_RETELLING);
-        processingEvent.setBaseId(retelling.getId());
+        processingEvent.setRetellingId(retelling.getId());
         processingEventRepository.save(processingEvent);
 
         log.info("Успешно выполнен пересказ материала по тегу: {}. Название материала: {}", retelling.getTag(), content.getTitle());

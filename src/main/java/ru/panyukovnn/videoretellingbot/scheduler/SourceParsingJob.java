@@ -41,10 +41,10 @@ public class SourceParsingJob {
                 try {
                     Content content = habrLoader.load(link);
 
-                    if (!processingEventRepository.existsByBaseId(content.getId())) {
+                    if (!processingEventRepository.existsByContentId(content.getId())) {
                         processingEventRepository.save(ProcessingEvent.builder()
                             .type(ProcessingEventType.RATE_RAW_MATERIAL)
-                            .baseId(content.getId())
+                            .contentId(content.getId())
                             .status(ProcessingStatus.NEW)
                             .build());
                     }

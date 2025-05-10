@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface ProcessingEventRepository extends JpaRepository<ProcessingEvent, UUID> {
 
-    boolean existsByBaseId(UUID contentId);
+    boolean existsByContentId(UUID contentId);
 
     List<ProcessingEvent> findAllByType(ProcessingEventType processingEventType);
 

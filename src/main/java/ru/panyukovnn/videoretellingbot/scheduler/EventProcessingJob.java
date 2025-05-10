@@ -39,7 +39,7 @@ public class EventProcessingJob {
                 eventProcessorByType.get(event.getType())
                     .process(event);
             } catch (Exception e) {
-                log.error("Ошибка обработке события: {}. baseId: {}. Сообщение: {}", event.getType(), event.getBaseId(), e.getMessage(), e);
+                log.error("Ошибка обработке события: {}. contentId: {}. retellingId: {}. Сообщение: {}", event.getType(), event.getContentId(), event.getRetellingId(), e.getMessage(), e);
             }
         });
 

@@ -29,7 +29,7 @@ public class RateRawMaterialEventProcessorImpl implements EventProcessor {
 
     @Override
     public void process(ProcessingEvent processingEvent) {
-        Content content = contentRepository.findById(processingEvent.getBaseId())
+        Content content = contentRepository.findById(processingEvent.getContentId())
             .orElse(null);
 
         if (content == null) {
