@@ -37,7 +37,7 @@ class TgBotListenerTest extends AbstractTest {
             .hasSize(1)
             .allSatisfy(client -> {
                 assertEquals(123L, client.getTgUserId());
-                assertEquals(1234L, client.getTgLastChatId());
+                assertEquals(123L, client.getTgLastChatId());
                 assertEquals("username", client.getUsername());
                 assertEquals("firstName", client.getFirstname());
                 assertEquals("lastName", client.getLastname());
@@ -57,7 +57,7 @@ class TgBotListenerTest extends AbstractTest {
         user.setLastName("lastName");
 
         Chat chat = new Chat();
-        chat.setId(1234L);
+        chat.setId(123L);
 
         Message message = new Message();
         message.setFrom(user);
