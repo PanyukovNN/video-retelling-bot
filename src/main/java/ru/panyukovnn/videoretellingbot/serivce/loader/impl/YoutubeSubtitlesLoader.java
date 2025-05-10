@@ -9,17 +9,19 @@ import ru.panyukovnn.videoretellingbot.model.content.Content;
 import ru.panyukovnn.videoretellingbot.model.content.ContentType;
 import ru.panyukovnn.videoretellingbot.model.content.Lang;
 import ru.panyukovnn.videoretellingbot.model.content.Source;
-import ru.panyukovnn.videoretellingbot.util.YtDlpProcessBuilderCreator;
 import ru.panyukovnn.videoretellingbot.serivce.loader.DataLoader;
+import ru.panyukovnn.videoretellingbot.util.SubtitlesFileNameGenerator;
+import ru.panyukovnn.videoretellingbot.util.YtDlpProcessBuilderCreator;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -35,6 +37,7 @@ public class YoutubeSubtitlesLoader implements DataLoader {
     private static final String SUBTITLES_DIRECTORY = "./subtitles/";
 
     private final YtDlpProcessBuilderCreator ytDlpProcessBuilderCreator;
+    private final SubtitlesFileNameGenerator subtitlesFileNameGenerator;
 
     public Content load(String link) {
         log.info("Начинаю загрузку субтитров из youtube видео по ссылке: {}", link);
@@ -61,6 +64,10 @@ public class YoutubeSubtitlesLoader implements DataLoader {
                 .meta(null)
                 .content(subtitles)
                 .build();
+        } catch (RetellingException e) {
+            log.warn("Ошибка загрузки субтитров из видео: {}", e.getMessage(), e);
+
+            throw new RetellingException("e716", "Не удалось извлечь субтитры из видео. " + e.getMessage(), e);
         } catch (Exception e) {
             log.error("Ошибка загрузки субтитров из видео: {}", e.getMessage(), e);
 
@@ -103,7 +110,13 @@ public class YoutubeSubtitlesLoader implements DataLoader {
                 })
                 .get();
         } catch (ExecutionException | InterruptedException e) {
-            throw new RetellingException("3db2", "Ошибка выгрузки файлов субтитров: " + e.getMessage(), e);
+            if (e.getCause() instanceof RetellingException) {
+                throw new RetellingException("a7e9", e.getCause().getMessage(), e);
+            }
+
+            log.error("Ошибка выгрузки файлов субтитров: {}", e.getMessage(), e);
+
+            throw new RetellingException("3db2", "Ошибка выгрузки файлов субтитров", e);
         } finally {
             executorService.shutdown();
         }
@@ -136,7 +149,7 @@ public class YoutubeSubtitlesLoader implements DataLoader {
      * @return имя файла с субтитрами, куда произошла выгрузка
      */
     private Optional<String> tryDownloadSubtitles(String videoUrl, String lang, boolean isAutoSubs) {
-        String outputFileName = "subtitles-" + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME) + "-" + UUID.randomUUID().toString().substring(0, 8);
+        String outputFileName = subtitlesFileNameGenerator.generateFileName();
 
         ProcessBuilder builder = ytDlpProcessBuilderCreator.createProcessBuilder(videoUrl, lang, isAutoSubs, SUBTITLES_DIRECTORY + outputFileName);
 

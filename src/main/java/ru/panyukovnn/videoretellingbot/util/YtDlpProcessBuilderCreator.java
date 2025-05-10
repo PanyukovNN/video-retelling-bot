@@ -11,7 +11,7 @@ import java.io.File;
 @Service
 public class YtDlpProcessBuilderCreator {
 
-    public ProcessBuilder createProcessBuilder(String videoUrl, String lang, boolean isAutoSubs, String outputFileName) {
+    public ProcessBuilder createProcessBuilder(String videoUrl, String lang, Boolean isAutoSubs, String outputFileName) {
         return new ProcessBuilder(
             "./yt-dlp/" + defineYtDlpExecutableFileName(),
             isAutoSubs ? "--write-auto-subs" : "--write-subs",
