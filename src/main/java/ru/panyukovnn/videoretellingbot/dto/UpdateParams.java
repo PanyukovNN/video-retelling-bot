@@ -11,6 +11,7 @@ public class UpdateParams {
 
     private Long userId;
     private Long chatId;
+    private Integer topicId;
     private String userName;
     private String firstname;
     private String lastname;

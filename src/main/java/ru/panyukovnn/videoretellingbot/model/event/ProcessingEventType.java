@@ -7,6 +7,11 @@ public enum ProcessingEventType {
      */
     RATE_RAW_MATERIAL,
     /**
+     * Материал со слишком низкой оценкой - не подлежит пересказу и публикации
+     * Терминальный статус
+     */
+    UNDERRATED,
+    /**
      * Задача на пересказ
      */
     RETELLING,

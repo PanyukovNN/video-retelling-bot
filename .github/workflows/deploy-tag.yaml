@@ -27,3 +27,17 @@ jobs:
             docker compose down -v
             APP_TAG=${IMAGE_TAG} docker compose up -d
           "
+
+      - name: Notify Telegram on success
+        if: success()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.NOTIFICATION_TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.NOTIFICATION_TELEGRAM_CHAT_ID }} \
+            -d text="✅ retelling-bot %0A Успешно выполнен deploy ${{ github.ref_name }}"
+
+      - name: Notify Telegram on failure
+        if: failure()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.NOTIFICATION_TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.NOTIFICATION_TELEGRAM_CHAT_ID }} \
+            -d text="❌ retelling-bot %0A Ошибка при деплое ${{ github.ref_name }} %0A Посмотреть лог: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

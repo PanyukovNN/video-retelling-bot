@@ -14,7 +14,8 @@ retelling:
       cron: "-"
   publishing:
     chat-id: 1
-    thread-id: 2
+    java-retelling-tg-topic-id: 2
+    rate-tg-topic-id: 3
   data-finder:
     habr:
       period-of-days-to-look-for: 10_000_000 # Потенциально бесконечное количество дней, чтобы не зависеть от текущей даты в тестах

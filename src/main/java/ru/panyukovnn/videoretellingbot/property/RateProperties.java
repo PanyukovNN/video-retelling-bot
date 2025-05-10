@@ -8,10 +8,8 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "retelling.publishing")
-public class PublishingProperties {
+@ConfigurationProperties(prefix = "retelling.rate")
+public class RateProperties {
 
-    private Long chatId;
-    private Integer javaRetellingTgTopicId;
-    private Integer rateTgTopicId;
+    private Integer threshold;
 }

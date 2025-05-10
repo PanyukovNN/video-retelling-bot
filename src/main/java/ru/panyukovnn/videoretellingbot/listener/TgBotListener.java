@@ -87,6 +87,7 @@ public class TgBotListener {
             return Optional.of(new UpdateParams(
                 user.getId(),
                 update.getCallbackQuery().getMessage().getChatId(),
+                update.getCallbackQuery().getMessage().getMessageThreadId(),
                 user.getUserName(),
                 user.getFirstName(),
                 user.getLastName(),
@@ -104,6 +105,7 @@ public class TgBotListener {
         return Optional.of(new UpdateParams(
             user.getId(),
             update.getMessage().getChatId(),
+            update.getMessage().getMessageThreadId(),
             user.getUserName(),
             user.getFirstName(),
             user.getLastName(),

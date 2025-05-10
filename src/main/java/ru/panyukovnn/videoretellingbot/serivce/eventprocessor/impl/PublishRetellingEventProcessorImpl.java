@@ -47,7 +47,7 @@ public class PublishRetellingEventProcessorImpl implements EventProcessor {
 
             String formattedMessage = formatMessage(content, retelling.getRetelling());
 
-            tgSender.sendMessage(publishingProperties.getChatId(), publishingProperties.getThreadId(), formattedMessage);
+            tgSender.sendMessage(publishingProperties.getChatId(), publishingProperties.getJavaRetellingTgTopicId(), formattedMessage);
 
             log.info("Успешно выполнена отправка пересказа материала по тегу: {}. Название материала: {}", retelling.getTag(), content != null ? content.getTitle() : "undefined");
 
@@ -59,6 +59,11 @@ public class PublishRetellingEventProcessorImpl implements EventProcessor {
         }
 
         processingEventRepository.save(processingEvent);
+    }
+
+    @Override
+    public ProcessingEventType getProcessingEventType() {
+        return ProcessingEventType.PUBLISH_RETELLING;
     }
 
     private static String formatMessage(@Nullable Content content, String retelling) {
@@ -74,11 +79,6 @@ public class PublishRetellingEventProcessorImpl implements EventProcessor {
         String firstLine = "[" + title + "](" + content.getLink() + ")\n\n";
 
         return firstLine + retelling;
-    }
-
-    @Override
-    public ProcessingEventType getProcessingEventType() {
-        return ProcessingEventType.PUBLISH_RETELLING;
     }
 
 }

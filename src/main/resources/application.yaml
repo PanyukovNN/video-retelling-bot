@@ -38,7 +38,10 @@ retelling:
       cron: 0 * * * * *
   publishing:
     chat-id: ${PUBLISHING_CHAT_ID}
-    thread-id: ${PUBLISHING_THREAD_ID}
+    java-retelling-tg-topic-id: ${JAVA_RETELLING_TG_TOPIC_ID}
+    rate-tg-topic-id: ${RATE_TG_TOPIC_ID}
+  rate:
+    threshold: 70 # Оценка материала должна быть выше 70% для его публикации
   data-finder:
     habr:
       period-of-days-to-look-for: 1
