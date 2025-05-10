@@ -3,7 +3,6 @@ package ru.panyukovnn.videoretellingbot.serivce.eventprocessor.impl;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.SpringApplicationEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.panyukovnn.videoretellingbot.model.content.Content;
@@ -17,7 +16,6 @@ import ru.panyukovnn.videoretellingbot.repository.RetellingRepository;
 import ru.panyukovnn.videoretellingbot.serivce.eventprocessor.EventProcessor;
 import ru.panyukovnn.videoretellingbot.serivce.telegram.TgSender;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j

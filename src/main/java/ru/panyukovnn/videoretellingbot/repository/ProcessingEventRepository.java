@@ -11,7 +11,5 @@ public interface ProcessingEventRepository extends JpaRepository<ProcessingEvent
 
     boolean existsByContentId(UUID contentId);
 
-    List<ProcessingEvent> findAllByType(ProcessingEventType processingEventType);
-
     List<ProcessingEvent> findAllByTypeIn(List<ProcessingEventType> processingEventTypes);
 }

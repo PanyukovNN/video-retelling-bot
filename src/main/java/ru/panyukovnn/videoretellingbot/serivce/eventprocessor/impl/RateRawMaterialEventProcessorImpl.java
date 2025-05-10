@@ -43,21 +43,21 @@ public class RateRawMaterialEventProcessorImpl implements EventProcessor {
 
         String retellingResponse = openAiClient.retellingBlockingCall("rate_material", prompt, content.getContent());
 
-        String rawRate = "";
+        StringBuilder rawRate = new StringBuilder();
         for (int i = 0; i < 7; i++) {
             char c = retellingResponse.charAt(i);
             if (Character.isDigit(c)) {
-                rawRate += c;
+                rawRate.append(c);
             }
         }
-        boolean parsable = NumberUtils.isParsable(rawRate);
+        boolean parsable = NumberUtils.isParsable(rawRate.toString());
         if (!parsable) {
             throw new RawMaterialRateException("2c0b", "Не удалось распарсить оценку материала: " + rawRate + ". Ответ от ИИ: " + retellingResponse);
         }
 
         ContentRate contentRate = contentRateRepository.save(ContentRate.builder()
             .contentId(content.getId())
-            .rate(Integer.parseInt(rawRate))
+            .rate(Integer.parseInt(rawRate.toString()))
             .prompt(prompt)
             .grounding(retellingResponse)
             .tag("Java разработка")
