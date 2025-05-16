@@ -40,6 +40,7 @@ retelling:
     chat-id: ${PUBLISHING_CHAT_ID}
     java-retelling-tg-topic-id: ${JAVA_RETELLING_TG_TOPIC_ID}
     rate-tg-topic-id: ${RATE_TG_TOPIC_ID}
+    debug-topic-id: ${DEBUG_TG_TOPIC_ID}
   rate:
     threshold: 70 # Оценка материала должна быть выше 70% для его публикации
   data-finder:
