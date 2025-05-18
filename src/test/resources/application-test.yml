@@ -14,8 +14,19 @@ retelling:
       cron: "-"
   publishing:
     chat-id: 1
-    java-retelling-tg-topic-id: 2
     rate-tg-topic-id: 3
+    debug-topic-id: 4
   data-finder:
     habr:
       period-of-days-to-look-for: 10_000_000 # Потенциально бесконечное количество дней, чтобы не зависеть от текущей даты в тестах
+  conveyor-tag-config-map:
+    java-habr:
+      rate-material-prompt: prompt1
+      retelling-prompt: prompt2
+      publishing-topic-id: 5
+    tg-message-batch:
+      rate-material-prompt: null
+      retelling-prompt: prompt3
+      publishing-topic-id: 6
+  prompt:
+    bot-retelling-prompt: prompt

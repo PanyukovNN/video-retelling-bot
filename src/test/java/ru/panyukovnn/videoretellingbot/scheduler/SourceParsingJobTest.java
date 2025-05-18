@@ -5,13 +5,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.panyukovnn.videoretellingbot.model.event.ProcessingEventType;
-import ru.panyukovnn.videoretellingbot.model.event.ProcessingStatus;
 import ru.panyukovnn.videoretellingbot.model.content.Content;
 import ru.panyukovnn.videoretellingbot.model.content.Source;
+import ru.panyukovnn.videoretellingbot.model.event.ProcessingEventType;
 import ru.panyukovnn.videoretellingbot.repository.ContentRepository;
-import ru.panyukovnn.videoretellingbot.repository.ProcessingEventRepository;
 import ru.panyukovnn.videoretellingbot.serivce.autodatafinder.AutoDataFinder;
+import ru.panyukovnn.videoretellingbot.serivce.domain.ProcessingEventDomainService;
 import ru.panyukovnn.videoretellingbot.serivce.loader.DataLoader;
 
 import java.util.Collections;
@@ -30,7 +29,7 @@ public class SourceParsingJobTest {
     @Mock
     private ContentRepository mockContentRepository;
     @Mock
-    private ProcessingEventRepository mockProcessingEventRepository ;
+    private ProcessingEventDomainService processingEventDomainService;
 
     @InjectMocks
     private SourceParsingJob sourceParsingJob;
@@ -60,9 +59,8 @@ public class SourceParsingJobTest {
         // Assert
         verify(mockHabrDataFinder).findDataToLoad();
         verify(mockHabrLoader).load("https://habr.com/article/2");
-        verify(mockProcessingEventRepository).save(argThat(event ->
-                event.getType() == ProcessingEventType.RATE_RAW_MATERIAL &&
-                event.getStatus() == ProcessingStatus.NEW
+        verify(processingEventDomainService).save(argThat(event ->
+                event.getType() == ProcessingEventType.RATE_RAW_MATERIAL
         ));
     }
 
@@ -84,6 +82,6 @@ public class SourceParsingJobTest {
         // Assert
         verify(mockHabrDataFinder).findDataToLoad();
         verify(mockHabrLoader, never()).load(anyString());
-        verify(mockProcessingEventRepository, never()).save(any());
+        verify(processingEventDomainService, never()).save(any());
     }
 }

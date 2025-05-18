@@ -7,16 +7,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.panyukovnn.videoretellingbot.client.OpenAiClient;
 import ru.panyukovnn.videoretellingbot.exception.RawMaterialRateException;
+import ru.panyukovnn.videoretellingbot.model.ConveyorTag;
 import ru.panyukovnn.videoretellingbot.model.content.Content;
 import ru.panyukovnn.videoretellingbot.model.content.ContentRate;
 import ru.panyukovnn.videoretellingbot.model.event.ProcessingEvent;
 import ru.panyukovnn.videoretellingbot.model.event.ProcessingEventType;
-import ru.panyukovnn.videoretellingbot.property.PromptProperties;
+import ru.panyukovnn.videoretellingbot.property.ConveyorTagProperties;
 import ru.panyukovnn.videoretellingbot.property.PublishingProperties;
 import ru.panyukovnn.videoretellingbot.property.RateProperties;
 import ru.panyukovnn.videoretellingbot.repository.ContentRateRepository;
 import ru.panyukovnn.videoretellingbot.repository.ContentRepository;
-import ru.panyukovnn.videoretellingbot.repository.ProcessingEventRepository;
+import ru.panyukovnn.videoretellingbot.serivce.domain.ProcessingEventDomainService;
 import ru.panyukovnn.videoretellingbot.serivce.telegram.TgSender;
 
 import java.util.Optional;
@@ -36,15 +37,15 @@ class RateRawMaterialEventProcessorImplTest {
     @Mock
     private RateProperties rateProperties;
     @Mock
-    private PromptProperties promptProperties;
-    @Mock
     private ContentRepository contentRepository;
     @Mock
     private PublishingProperties publishingProperties;
     @Mock
     private ContentRateRepository contentRateRepository;
     @Mock
-    private ProcessingEventRepository processingEventRepository;
+    private ConveyorTagProperties conveyorTagProperties;
+    @Mock
+    private ProcessingEventDomainService processingEventDomainService;
 
     @InjectMocks
     private RateRawMaterialEventProcessorImpl rateRawMaterialEventProcessor;
@@ -61,9 +62,13 @@ class RateRawMaterialEventProcessorImplTest {
 
         ProcessingEvent processingEvent = new ProcessingEvent();
         processingEvent.setContentId(contentId);
+        processingEvent.setConveyorTag(ConveyorTag.JAVA_HABR);
+
+        ConveyorTagProperties.ConveyorTagConfig conveyorTagConfig = new ConveyorTagProperties.ConveyorTagConfig();
+        conveyorTagConfig.setRateMaterialPrompt("Rate prompt");
 
         when(contentRepository.findById(contentId)).thenReturn(Optional.of(content));
-        when(promptProperties.getRateMaterial()).thenReturn("Rate prompt");
+        when(conveyorTagProperties.getWithGuarantee(ConveyorTag.JAVA_HABR)).thenReturn(conveyorTagConfig);
         when(openAiClient.retellingBlockingCall(anyString(), anyString(), anyString()))
             .thenReturn("75 - Good content");
         when(rateProperties.getThreshold()).thenReturn(50);
@@ -77,8 +82,13 @@ class RateRawMaterialEventProcessorImplTest {
         // Assert
         verify(contentRepository).findById(contentId);
         verify(openAiClient).retellingBlockingCall("rate_material", "Rate prompt", "Test Content");
-        verify(contentRateRepository).save(any(ContentRate.class));
-        verify(processingEventRepository).save(argThat(event ->
+        verify(contentRateRepository).save(argThat(rate ->
+            rate.getContentId().equals(contentId) &&
+            rate.getRate() == 75 &&
+            rate.getPrompt().equals("Rate prompt") &&
+            rate.getGrounding().equals("75 - Good content")
+        ));
+        verify(processingEventDomainService).save(argThat(event ->
             event.getType() == ProcessingEventType.RETELLING
         ));
         verify(tgSender).sendMessage(eq(123456789L), eq(987654321), anyString());
@@ -96,9 +106,13 @@ class RateRawMaterialEventProcessorImplTest {
 
         ProcessingEvent processingEvent = new ProcessingEvent();
         processingEvent.setContentId(contentId);
+        processingEvent.setConveyorTag(ConveyorTag.JAVA_HABR);
+
+        ConveyorTagProperties.ConveyorTagConfig conveyorTagConfig = new ConveyorTagProperties.ConveyorTagConfig();
+        conveyorTagConfig.setRateMaterialPrompt("Rate prompt");
 
         when(contentRepository.findById(contentId)).thenReturn(Optional.of(content));
-        when(promptProperties.getRateMaterial()).thenReturn("Rate prompt");
+        when(conveyorTagProperties.getWithGuarantee(ConveyorTag.JAVA_HABR)).thenReturn(conveyorTagConfig);
         when(openAiClient.retellingBlockingCall(anyString(), anyString(), anyString()))
             .thenReturn("35 - Poor content");
         when(rateProperties.getThreshold()).thenReturn(50);
@@ -110,7 +124,7 @@ class RateRawMaterialEventProcessorImplTest {
         rateRawMaterialEventProcessor.process(processingEvent);
 
         // Assert
-        verify(processingEventRepository).save(argThat(event ->
+        verify(processingEventDomainService).save(argThat(event ->
             event.getType() == ProcessingEventType.UNDERRATED
         ));
     }
@@ -125,9 +139,13 @@ class RateRawMaterialEventProcessorImplTest {
 
         ProcessingEvent processingEvent = new ProcessingEvent();
         processingEvent.setContentId(contentId);
+        processingEvent.setConveyorTag(ConveyorTag.JAVA_HABR);
+
+        ConveyorTagProperties.ConveyorTagConfig conveyorTagConfig = new ConveyorTagProperties.ConveyorTagConfig();
+        conveyorTagConfig.setRateMaterialPrompt("Rate prompt");
 
         when(contentRepository.findById(contentId)).thenReturn(Optional.of(content));
-        when(promptProperties.getRateMaterial()).thenReturn("Rate prompt");
+        when(conveyorTagProperties.getWithGuarantee(ConveyorTag.JAVA_HABR)).thenReturn(conveyorTagConfig);
         when(openAiClient.retellingBlockingCall(anyString(), anyString(), anyString()))
             .thenReturn("Invalid rate format");
 
@@ -143,6 +161,7 @@ class RateRawMaterialEventProcessorImplTest {
         UUID contentId = UUID.randomUUID();
         ProcessingEvent processingEvent = new ProcessingEvent();
         processingEvent.setContentId(contentId);
+        processingEvent.setConveyorTag(ConveyorTag.JAVA_HABR);
 
         when(contentRepository.findById(contentId)).thenReturn(Optional.empty());
 
@@ -150,7 +169,7 @@ class RateRawMaterialEventProcessorImplTest {
         rateRawMaterialEventProcessor.process(processingEvent);
 
         // Assert
-        verify(processingEventRepository).delete(processingEvent);
+        verify(processingEventDomainService).delete(processingEvent);
         verifyNoMoreInteractions(openAiClient, contentRateRepository, tgSender);
     }
 

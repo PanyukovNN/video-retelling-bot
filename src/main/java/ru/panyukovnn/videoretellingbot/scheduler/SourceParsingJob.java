@@ -30,7 +30,6 @@ public class SourceParsingJob {
 
     @Async("sourceParsingScheduler")
     @Scheduled(cron = "${retelling.scheduled-jobs.source-parsing.habr-cron}")
-    @PostConstruct
     public void parseHabr() {
         try {
             Content lastContent = contentRepository.findTopBySourceOrderByPublicationDateDesc(Source.HABR)

@@ -1,24 +1,27 @@
 package ru.panyukovnn.videoretellingbot.serivce.eventprocessor.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.panyukovnn.videoretellingbot.client.OpenAiClient;
+import ru.panyukovnn.videoretellingbot.model.ConveyorTag;
 import ru.panyukovnn.videoretellingbot.model.content.Content;
 import ru.panyukovnn.videoretellingbot.model.event.ProcessingEvent;
 import ru.panyukovnn.videoretellingbot.model.event.ProcessingEventType;
 import ru.panyukovnn.videoretellingbot.model.retelling.Retelling;
-import ru.panyukovnn.videoretellingbot.property.PromptProperties;
+import ru.panyukovnn.videoretellingbot.property.ConveyorTagProperties;
 import ru.panyukovnn.videoretellingbot.repository.ContentRepository;
-import ru.panyukovnn.videoretellingbot.repository.ProcessingEventRepository;
 import ru.panyukovnn.videoretellingbot.repository.RetellingRepository;
+import ru.panyukovnn.videoretellingbot.serivce.domain.ProcessingEventDomainService;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -28,13 +31,13 @@ class RetellingEventProcessorImplTest {
     @Mock
     private OpenAiClient openAiClient;
     @Mock
-    private PromptProperties promptProperties;
-    @Mock
     private ContentRepository contentRepository;
     @Mock
     private RetellingRepository retellingRepository;
     @Mock
-    private ProcessingEventRepository processingEventRepository;
+    private ConveyorTagProperties conveyorTagProperties;
+    @Mock
+    private ProcessingEventDomainService processingEventDomainService;
 
     @InjectMocks
     private RetellingEventProcessorImpl retellingEventProcessor;
@@ -50,9 +53,14 @@ class RetellingEventProcessorImplTest {
 
         ProcessingEvent processingEvent = new ProcessingEvent();
         processingEvent.setContentId(contentId);
+        processingEvent.setType(ProcessingEventType.RETELLING);
+        processingEvent.setConveyorTag(ConveyorTag.JAVA_HABR);
+
+        ConveyorTagProperties.ConveyorTagConfig conveyorTagConfig = new ConveyorTagProperties.ConveyorTagConfig();
+        conveyorTagConfig.setRetellingPrompt("Retelling prompt");
 
         when(contentRepository.findById(contentId)).thenReturn(Optional.of(content));
-        when(promptProperties.getRetelling()).thenReturn("Retelling prompt");
+        when(conveyorTagProperties.getWithGuarantee(ConveyorTag.JAVA_HABR)).thenReturn(conveyorTagConfig);
         when(openAiClient.retellingBlockingCall(anyString(), anyString(), anyString()))
             .thenReturn("Retelling content");
         when(retellingRepository.save(any(Retelling.class))).thenAnswer(i -> i.getArgument(0));
@@ -62,33 +70,33 @@ class RetellingEventProcessorImplTest {
 
         // Assert
         verify(contentRepository).findById(contentId);
-        verify(openAiClient).retellingBlockingCall("retelling", "Retelling prompt", "Test Content");
+        verify(openAiClient).retellingBlockingCall("RETELLING", "Retelling prompt", "Test Content");
         verify(retellingRepository).save(argThat(retelling ->
             retelling.getContentId().equals(contentId) &&
             retelling.getPrompt().equals("Retelling prompt") &&
             retelling.getAiModel().equals("deepseek-chat") &&
-            retelling.getRetelling().equals("Retelling content") &&
-            retelling.getTag().equals("Java разработка")
+            retelling.getRetelling().equals("Retelling content")
         ));
-        verify(processingEventRepository).save(argThat(event ->
+        verify(processingEventDomainService).save(argThat(event ->
             event.getType() == ProcessingEventType.PUBLISH_RETELLING
         ));
     }
 
     @Test
-    void when_process_withNonExistentContent_then_deleteEvent() {
+    void when_process_withNonExistentContent_then_throwException() {
         // Arrange
         UUID contentId = UUID.randomUUID();
         ProcessingEvent processingEvent = new ProcessingEvent();
         processingEvent.setContentId(contentId);
+        processingEvent.setConveyorTag(ConveyorTag.JAVA_HABR);
 
         when(contentRepository.findById(contentId)).thenReturn(Optional.empty());
 
         // Act
-        retellingEventProcessor.process(processingEvent);
+        assertThrows(EntityNotFoundException.class, () -> retellingEventProcessor.process(processingEvent));
 
         // Assert
-        verify(processingEventRepository).delete(processingEvent);
+        verify(processingEventDomainService).delete(processingEvent);
         verifyNoMoreInteractions(openAiClient, retellingRepository);
     }
 
