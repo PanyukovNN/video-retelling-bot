@@ -19,11 +19,7 @@ public class TgMessagePreparer {
 //        preparedMessage = escapeSymoblsForMarkdownV2(preparedMessage);
         preparedMessage = replaceDoubleStars(preparedMessage);
 
-        List<String> splitLongMessages = splitTooLongMessage(preparedMessage);
-
-        splitLongMessages.forEach(log::info);
-
-        return splitLongMessages;
+        return splitTooLongMessage(preparedMessage);
     }
 
     protected List<String> splitTooLongMessage(String message) {

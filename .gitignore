@@ -42,3 +42,5 @@ bin/
 .subtitles/
 /deploy/config.env
 /src/main/resources/application-localdev.yaml
+/credentials.txt
+/deploy/application-prom.yaml

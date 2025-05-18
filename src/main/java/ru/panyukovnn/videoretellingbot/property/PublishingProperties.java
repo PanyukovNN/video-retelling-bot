@@ -12,6 +12,6 @@ import org.springframework.stereotype.Component;
 public class PublishingProperties {
 
     private Long chatId;
-    private Integer javaRetellingTgTopicId;
     private Integer rateTgTopicId;
+
 }

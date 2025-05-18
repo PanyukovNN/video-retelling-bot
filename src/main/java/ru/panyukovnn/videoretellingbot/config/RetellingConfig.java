@@ -3,7 +3,6 @@ package ru.panyukovnn.videoretellingbot.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
-import ru.panyukovnn.videoretellingbot.model.event.ProcessingEvent;
 import ru.panyukovnn.videoretellingbot.model.event.ProcessingEventType;
 import ru.panyukovnn.videoretellingbot.property.ExecutorsProperty;
 import ru.panyukovnn.videoretellingbot.serivce.eventprocessor.EventProcessor;

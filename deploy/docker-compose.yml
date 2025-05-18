@@ -4,8 +4,11 @@ services:
   retelling-bot:
     image: ghcr.io/panyukovnn/retelling-bot:${APP_TAG}
     container_name: retelling-bot
+    ports:
+      - 8082:8083
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
-      - ./config.env
       - /etc/common-config/config.env
+    volumes:
+      - ./application-prom.yaml:/application-prom.yaml

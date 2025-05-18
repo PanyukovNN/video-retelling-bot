@@ -11,6 +11,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "retelling.prompt")
 public class PromptProperties {
 
-    private String retelling;
-    private String rateMaterial;
+    private String botRetellingPrompt;
 }

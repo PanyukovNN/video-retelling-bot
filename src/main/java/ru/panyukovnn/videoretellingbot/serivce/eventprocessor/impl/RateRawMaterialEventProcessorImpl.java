@@ -8,16 +8,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.panyukovnn.videoretellingbot.client.OpenAiClient;
 import ru.panyukovnn.videoretellingbot.exception.RawMaterialRateException;
+import ru.panyukovnn.videoretellingbot.model.ConveyorTag;
 import ru.panyukovnn.videoretellingbot.model.content.Content;
 import ru.panyukovnn.videoretellingbot.model.content.ContentRate;
 import ru.panyukovnn.videoretellingbot.model.event.ProcessingEvent;
 import ru.panyukovnn.videoretellingbot.model.event.ProcessingEventType;
-import ru.panyukovnn.videoretellingbot.property.PromptProperties;
+import ru.panyukovnn.videoretellingbot.property.ConveyorTagProperties;
 import ru.panyukovnn.videoretellingbot.property.PublishingProperties;
 import ru.panyukovnn.videoretellingbot.property.RateProperties;
 import ru.panyukovnn.videoretellingbot.repository.ContentRateRepository;
 import ru.panyukovnn.videoretellingbot.repository.ContentRepository;
-import ru.panyukovnn.videoretellingbot.repository.ProcessingEventRepository;
+import ru.panyukovnn.videoretellingbot.serivce.domain.ProcessingEventDomainService;
 import ru.panyukovnn.videoretellingbot.serivce.eventprocessor.EventProcessor;
 import ru.panyukovnn.videoretellingbot.serivce.telegram.TgSender;
 
@@ -31,11 +32,11 @@ public class RateRawMaterialEventProcessorImpl implements EventProcessor {
     private final TgSender tgSender;
     private final OpenAiClient openAiClient;
     private final RateProperties rateProperties;
-    private final PromptProperties promptProperties;
     private final ContentRepository contentRepository;
     private final PublishingProperties publishingProperties;
+    private final ConveyorTagProperties conveyorTagProperties;
     private final ContentRateRepository contentRateRepository;
-    private final ProcessingEventRepository processingEventRepository;
+    private final ProcessingEventDomainService processingEventDomainService;
 
     @Override
     public void process(ProcessingEvent processingEvent) {
@@ -44,12 +45,20 @@ public class RateRawMaterialEventProcessorImpl implements EventProcessor {
 
         if (content == null) {
             log.warn("Не удалось выполнить оценку сырого материала, поскольку не найден контент, событие будет удалено");
-            processingEventRepository.delete(processingEvent);
+            processingEventDomainService.delete(processingEvent);
 
             return;
         }
 
-        String prompt = promptProperties.getRateMaterial();
+        ConveyorTag tag = processingEvent.getConveyorTag();
+        ConveyorTagProperties.ConveyorTagConfig conveyorTagConfig = conveyorTagProperties.getWithGuarantee(tag);
+        String prompt = conveyorTagConfig.getRateMaterialPrompt();
+
+        if (prompt == null) {
+            log.warn("Не удалось определить rateMaterial prompt по тегу: {}", tag);
+
+            return;
+        }
 
         String retellingResponse = openAiClient.retellingBlockingCall("rate_material", prompt, content.getContent());
 
@@ -86,7 +95,7 @@ public class RateRawMaterialEventProcessorImpl implements EventProcessor {
             log.info("Успешно выполнена оценка материала по тегу: {}. Название материала: {}", contentRate.getTag(), content.getTitle());
         }
 
-        processingEventRepository.save(processingEvent);
+        processingEventDomainService.save(processingEvent);
 
         String formattedMessage = formatMessage(content, contentRate.getGrounding());
 

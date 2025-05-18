@@ -36,10 +36,6 @@ public class Retelling extends AuditableEntity {
      * Пересказ
      */
     private String retelling;
-    /**
-     * Тег
-     */
-    private String tag;
 
     @Override
     public boolean equals(Object o) {

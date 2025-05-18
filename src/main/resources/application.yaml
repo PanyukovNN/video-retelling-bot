@@ -38,7 +38,6 @@ retelling:
       cron: 0 * * * * *
   publishing:
     chat-id: ${PUBLISHING_CHAT_ID}
-    java-retelling-tg-topic-id: ${JAVA_RETELLING_TG_TOPIC_ID}
     rate-tg-topic-id: ${RATE_TG_TOPIC_ID}
     debug-topic-id: ${DEBUG_TG_TOPIC_ID}
   rate:
@@ -47,9 +46,17 @@ retelling:
     habr:
       period-of-days-to-look-for: 1
 
+  conveyor-tag-config-map:
+    java-habr:
+      rate-material-prompt: ${JAVA_HABR_RATE_MATERIAL_PROMPT}
+      retelling-prompt: ${JAVA_HABR_RETELLING_PROMPT}
+      publishing-topic-id: ${JAVA_RETELLING_TG_TOPIC_ID}
+    tg-message-batch:
+      rate-material-prompt: null
+      retelling-prompt: ${TG_MESSAGE_BATCH_RETELLING_PROMPT}
+      publishing-topic-id: ${TG_MESSAGE_BATCH_RETELLING_TG_TOPIC_ID}
   prompt:
-    retelling: ${PROMPT_RETELLING}
-    rate-material: ${PROMPT_RATE_MATERIAL}
+    bot-retelling-prompt: ${BOT_RETELLING_PROMPT}
 
 bot:
   name: ${BOT_NAME}

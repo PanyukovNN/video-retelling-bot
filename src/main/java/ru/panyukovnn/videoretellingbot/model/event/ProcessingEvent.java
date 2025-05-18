@@ -2,6 +2,8 @@ package ru.panyukovnn.videoretellingbot.model.event;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.panyukovnn.videoretellingbot.model.ConveyorType;
+import ru.panyukovnn.videoretellingbot.model.ConveyorTag;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -30,13 +32,19 @@ public class ProcessingEvent {
     private UUID contentId;
     /**
      * Идентификатор пересказа
+     * Указывается на этапе пересказа
      */
     private UUID retellingId;
     /**
-     * Статус обработки
+     * Тип конвейера
      */
     @Enumerated(EnumType.STRING)
-    private ProcessingStatus status;
+    private ConveyorType conveyorType;
+    /**
+     * Тег, по которому конкретизируется конвейер
+     */
+    @Enumerated(EnumType.STRING)
+    private ConveyorTag conveyorTag;
 
     @Override
     public boolean equals(Object o) {

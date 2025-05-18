@@ -26,3 +26,9 @@ databaseChangeLog:
   - include:
       file: 07.update_processing_event.yml
       relativeToChangelogFile: true
+  - include:
+      file: 08.update_processing_event.yml
+      relativeToChangelogFile: true
+  - include:
+      file: 09.update_retellings.yml
+      relativeToChangelogFile: true
