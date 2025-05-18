@@ -24,15 +24,6 @@ public class ConveyorTagProperties {
 
     @PostConstruct
     public void validateOnStartup() {
-        conveyorTagConfigMap.entrySet().stream().forEach(entry -> {
-            String key = entry.getKey();
-            ConveyorTagConfig value = entry.getValue();
-
-            System.out.println("key = " + key + ", value.rateMaterialPrompt = " + value.getRateMaterialPrompt());
-            System.out.println("key = " + key + ", value.retellingPrompt = " + value.getRetellingPrompt());
-            System.out.println("key = " + key + ", value.publishingTopicId = " + value.getPublishingTopicId());
-        });
-
         List<ConveyorTag> notConfiguredTags = Arrays.stream(ConveyorTag.values())
             .filter(conveyorTag -> !conveyorTagConfigMap.containsKey(conveyorTag.getPropertyValue()))
             .toList();

@@ -48,6 +48,7 @@ public class ContentConsumerHandler {
             .contentId(content.getId())
             .type(conveyorType.getStartEventType())
             .conveyorTag(conveyorTag)
+            .conveyorType(conveyorType)
             .build();
         processingEventDomainService.save(processingEvent);
     }

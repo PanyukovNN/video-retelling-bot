@@ -30,3 +30,7 @@ retelling:
       publishing-topic-id: 6
   prompt:
     bot-retelling-prompt: prompt
+
+bot:
+  name: test-bot
+  token: test-token
