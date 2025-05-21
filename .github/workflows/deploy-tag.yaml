@@ -2,22 +2,30 @@ name: Deploy
 
 on:
   workflow_dispatch:
-    inputs:
-      image_tag:
-        description: 'Docker image tag to deploy'
-        required: true
-        type: string
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Проверка и извлечение тега из GITHUB_REF
+        id: extract_tag
+        run: |
+          echo "GITHUB_REF=${GITHUB_REF}"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            echo "✅ Найден тег: $TAG"
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Этот workflow должен запускаться с тега. Текущий ref: $GITHUB_REF"
+            exit 1
+          fi
+
       - name: Deploy to server
         env:
           SSH_PRIVATE_KEY: ${{ secrets.NVPN_SSH_PRIVATE_KEY }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
           SSH_USER: ${{ secrets.NVPN_SSH_USER }}
-          IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+          IMAGE_TAG: ${{ steps.extract_tag.outputs.tag }}
           REMOTE_DIR: retelling-bot
         run: |
           # Подключаемся к серверу и выполняем скрипт
