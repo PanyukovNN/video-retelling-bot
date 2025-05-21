@@ -20,7 +20,7 @@ public class ContentConsumerController {
     private final ContentConsumerHandler contentConsumerHandler;
 
     @PostMapping("/consume")
-    public CommonResponse<Void> consume(@RequestBody @Valid CommonRequest<ConsumeContentRequest> request) {
+    public CommonResponse<Void> postConsume(@RequestBody @Valid CommonRequest<ConsumeContentRequest> request) {
         contentConsumerHandler.handleConsumeContent(request.getBody());
 
         return CommonResponse.<Void>builder().build();

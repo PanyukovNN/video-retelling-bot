@@ -17,9 +17,9 @@ import ru.panyukovnn.videoretellingbot.serivce.autodatafinder.impl.HabrDataFinde
 import ru.panyukovnn.videoretellingbot.serivce.loader.impl.HabrLoader;
 import ru.panyukovnn.videoretellingbot.serivce.loader.impl.YoutubeSubtitlesLoader;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AbstractTest {
 
     @Autowired

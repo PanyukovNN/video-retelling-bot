@@ -1,7 +1,12 @@
 
+server:
+  port: 8082
+  servlet:
+    context-path: /${spring.application.name}
+
 spring:
   application:
-    name: retelling-bot
+    name: conveyor
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
@@ -67,3 +72,5 @@ logging:
     root: INFO
   console:
     enabled: true
+  web-logging:
+    log-body: true

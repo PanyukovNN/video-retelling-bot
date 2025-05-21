@@ -42,7 +42,7 @@ public class ContentConsumerHandler {
         contentDomainService.save(content);
 
         ConveyorType conveyorType = ConveyorType.valueOf(consumeContentRequest.getConveyorType().toUpperCase());
-        ConveyorTag conveyorTag = ConveyorTag.valueOf(consumeContentRequest.getTag().toUpperCase());
+        ConveyorTag conveyorTag = ConveyorTag.valueOf(consumeContentRequest.getConveyorTag().toUpperCase());
 
         ProcessingEvent processingEvent = ProcessingEvent.builder()
             .contentId(content.getId())

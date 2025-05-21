@@ -86,7 +86,7 @@ public class PublishRetellingEventProcessorImpl implements EventProcessor {
             .filter(StringUtils::hasText)
             .orElse("Ссылка");
 
-        String firstLine = "[" + title + "](" + content.getLink() + ")\n\n";
+        String firstLine = title + "\n" + content.getLink() + "\n\n";
 
         return firstLine + retelling;
     }
